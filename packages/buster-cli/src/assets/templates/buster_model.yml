@@ -1,0 +1,29 @@
+version: 2
+
+semantic_models:
+  - name: the_name_of_the_semantic_model ## Required
+    description: same as always ## Optional
+    model: ref('some_model') ## Required: the database identifier of the table/view/mv that this semantic model relates to.
+    defaults: ## Required TODO: figure out exactly what this is.
+      agg_time_dimension: dimension_name ## Required if the model contains measures
+    entities:
+      - name: <name of the entity> ## Required
+        type: Primary or natural or foreign or unique ## Required
+        description: A description of the field or role the entity takes in this table ## Optional
+        expr: The field that denotes that entity (transaction_id). ## Optional
+        join_type: many-to-one or one-to-one or one-to-many ## Required on foreign entities helps buster understand how to join the entity to the table.
+    measures:
+      - name: <name of the measure>
+        description: "same as always" ## Optional
+        agg: the aggregation type.
+        expr: the field
+        agg_params: "specific aggregation properties such as a percentile" ## Optional
+        agg_time_dimension: The time field. Defaults to the default agg time dimension for the semantic model. ##  Optional
+        non_additive_dimension: "Use these configs when you need non-additive dimensions." ## Optional
+    dimensions:
+      - name: <name of the dimension> # Required
+        type: Categorical or Time # Required
+        label: Recommended adding a string that defines the display value in downstream tools. # Optional
+        type_params: Specific type params such as if the time is primary or used as a partition # Required
+        description: Same as always # Optional
+        expr: The column name or expression. If not provided the default is the dimension name # Optional
