@@ -28,3 +28,4 @@ pub async fn get_dbt_profiles_yml() -> Result<Value> {
     let contents = fs::read_to_string(path).await?;
     Ok(serde_yaml::from_str(&contents)?)
 }
+
