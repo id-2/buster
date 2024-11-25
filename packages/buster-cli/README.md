@@ -10,7 +10,7 @@ TODO
 
 ## How does it work?
 
-You can imagine Buster as a layer on top of your dbt project that allows you to create and manage semantic models.  We collect extra metadata about your models, however dbt semantic models don't allow you to have extra fields than what they've defined.  When you run `buster deploy`, we will createa a dbt-compatible copy that is used to run the dbt commands.
+You can imagine Buster as a layer on top of your dbt project that allows you to create and manage semantic models. 
 
 ## Quick Start
 
