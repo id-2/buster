@@ -3,7 +3,7 @@ use dirs::home_dir;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::error::BusterError;
+use crate::{error::BusterError, utils::BusterClient};
 
 #[derive(Serialize, Deserialize)]
 pub struct BusterCredentials {
@@ -43,12 +43,24 @@ pub async fn get_buster_credentials() -> Result<BusterCredentials, BusterError> 
 }
 
 pub async fn get_and_validate_buster_credentials() -> Result<BusterCredentials, BusterError> {
+    // Get the credentials.
     let creds = match get_buster_credentials().await {
         Ok(creds) => creds,
         Err(e) => return Err(e),
     };
 
+    // Check if the API key is empty.
     if creds.api_key.is_empty() {
+        return Err(BusterError::InvalidCredentials);
+    }
+
+    // Validate the API key.
+    let buster_client = match BusterClient::new(creds.url.clone(), creds.api_key.clone()) {
+        Ok(buster_client) => buster_client,
+        Err(_) => return Err(BusterError::InvalidCredentials),
+    };
+
+    if !buster_client.validate_api_key().await? {
         return Err(BusterError::InvalidCredentials);
     }
 

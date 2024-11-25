@@ -5,6 +5,8 @@ use reqwest::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::error::BusterError;
+
 pub struct BusterClient {
     client: Client,
     base_url: String,
@@ -19,6 +21,13 @@ pub struct ValidateApiKeyResponse {
 #[derive(Debug, Serialize)]
 pub struct ValidateApiKeyRequest {
     pub api_key: String,
+}
+
+// Add this near other error-related code
+impl From<anyhow::Error> for BusterError {
+    fn from(error: anyhow::Error) -> Self {
+        BusterError::Other(error.to_string())
+    }
 }
 
 impl BusterClient {

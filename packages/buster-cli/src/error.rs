@@ -11,4 +11,6 @@ pub enum BusterError {
     ParseError { error: String },
     #[error("Failed to write file: {path}")]
     FileWriteError { path: PathBuf, error: String },
+    #[error("Other: {0}")]
+    Other(String),
 }
