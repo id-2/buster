@@ -14,3 +14,10 @@ pub enum BusterError {
     #[error("Other: {0}")]
     Other(String),
 }
+
+// Add this near other error-related code
+impl From<anyhow::Error> for BusterError {
+    fn from(error: anyhow::Error) -> Self {
+        BusterError::Other(error.to_string())
+    }
+}

@@ -1,8 +1,17 @@
 use anyhow::Result;
-use serde_yaml::{Mapping, Value};
 
 use serde::{Deserialize, Serialize};
 use tokio::fs;
+
+use crate::utils::{
+    BusterClient, PostDatasetsColumnsRequest, PostDatasetsEntityRelationshipsRequest,
+    PostDatasetsRequest,
+};
+
+use super::{
+    buster_credentials::BusterCredentials,
+    profiles::{get_project_profile, Profile},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BusterModelObject {
@@ -21,7 +30,7 @@ pub struct SemanticModel {
     pub name: String,
     pub defaults: ModelDefaults,
     pub description: String,
-    pub model: String,
+    pub model: Option<String>,
     pub entities: Vec<Entity>,
     pub dimensions: Vec<Dimension>,
     pub measures: Vec<Measure>,
@@ -90,4 +99,89 @@ pub async fn get_model_files() -> Result<Vec<BusterModelObject>> {
     }
 
     Ok(model_objects)
+}
+
+pub async fn upload_model_files(
+    model_objects: Vec<BusterModelObject>,
+    buster_creds: BusterCredentials,
+) -> Result<()> {
+    // First, get the project profile so we can know where the models were written
+    let (profile_name, profile) = get_project_profile().await?;
+
+    // Need to get the schema. TODO: Allow for target-specific commands
+    let schema = get_schema_name(&profile)?;
+
+    let mut post_datasets_req_body = Vec::new();
+
+    // Iterate through each model object and the semantic models within. These are the datasets we want to create.
+    for model in model_objects {
+        for semantic_model in model.model_file.semantic_models {
+            let mut columns = Vec::new();
+
+            for column in semantic_model.dimensions {
+                columns.push(PostDatasetsColumnsRequest {
+                    name: column.name,
+                    description: column.description,
+                    semantic_type: Some(String::from("dimension")),
+                    expr: Some(column.expr),
+                    type_: None,
+                    agg: None,
+                });
+            }
+
+            for column in semantic_model.measures {
+                columns.push(PostDatasetsColumnsRequest {
+                    name: column.name,
+                    description: column.description,
+                    semantic_type: Some(String::from("measure")),
+                    expr: Some(column.expr),
+                    type_: None,
+                    agg: Some(column.agg),
+                });
+            }
+
+            let mut entity_relationships = Vec::new();
+
+            for entity in semantic_model.entities {
+                entity_relationships.push(PostDatasetsEntityRelationshipsRequest {
+                    name: entity.name,
+                    expr: vec![entity.expr],
+                    type_: entity.entity_type,
+                });
+            }
+
+            let dataset = PostDatasetsRequest {
+                data_source_name: profile_name.clone(),
+                env: profile.target.clone(),
+                name: semantic_model.name,
+                model: semantic_model.model,
+                schema: schema.clone(),
+                description: semantic_model.description,
+                entity_relationships: Some(entity_relationships),
+                columns,
+            };
+
+            post_datasets_req_body.push(dataset);
+        };
+    };
+
+    let buster = BusterClient::new(buster_creds.url, buster_creds.api_key)?;
+
+    if let Err(e) = buster.post_datasets(post_datasets_req_body).await {
+        return Err(anyhow::anyhow!(
+            "Failed to upload model files to Buster: {}",
+            e
+        ));
+    };
+
+    Ok(())
+}
+
+fn get_schema_name(profile: &Profile) -> Result<String> {
+    let credentials = profile
+        .outputs
+        .get(&profile.target)
+        .ok_or(anyhow::anyhow!("Target not found: {}", profile.target))?;
+
+    Ok(credentials.credential.get_schema())
 }

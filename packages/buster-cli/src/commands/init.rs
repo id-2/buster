@@ -8,13 +8,10 @@ use crate::utils::{
     command::{check_dbt_installation, dbt_command},
     profiles::{get_dbt_profile_credentials, upload_dbt_profiles_to_buster},
     project_files::{create_buster_from_dbt_project_yml, find_dbt_projects},
+    text::print_error,
 };
 
 use super::auth;
-
-fn print_error(msg: &str) {
-    println!("{}", msg.red().bold());
-}
 
 pub async fn init() -> Result<()> {
     if let Err(e) = check_dbt_installation().await {

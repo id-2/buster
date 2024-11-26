@@ -7,7 +7,7 @@ use tokio::fs;
 
 use crate::utils::{BusterClient, PostDataSourcesRequest};
 
-use super::buster_credentials::BusterCredentials;
+use super::{buster_credentials::BusterCredentials, project_files::get_current_project};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DbtProfiles {
@@ -15,13 +15,13 @@ pub struct DbtProfiles {
     pub profiles: HashMap<String, Profile>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Profile {
     pub target: String,
     pub outputs: HashMap<String, Output>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Output {
     pub threads: Option<u32>,
     // TODO: Make this a struct for each of the different db types
@@ -54,6 +54,13 @@ impl Credential {
             Credential::Databricks(_) => "databricks".to_string(),
             Credential::Snowflake(_) => "snowflake".to_string(),
             Credential::Starrocks(_) => "starrocks".to_string(),
+        }
+    }
+
+    pub fn get_schema(&self) -> String {
+        match self {
+            Credential::Postgres(cred) => cred.schema.clone(),
+            _ => "".to_string(),
         }
     }
 }
@@ -161,11 +168,6 @@ pub async fn get_dbt_profiles_yml() -> Result<DbtProfiles> {
     Ok(serde_yaml::from_str(&contents)?)
 }
 
-pub async fn get_dbt_profile_names() -> Result<Vec<String>> {
-    let profiles = get_dbt_profiles_yml().await?;
-    Ok(profiles.profiles.keys().cloned().collect())
-}
-
 // Returns a list of tuples containing the profile name, environment, and credentials.
 pub async fn get_dbt_profile_credentials(
     profile_names: &Vec<String>,
@@ -207,4 +209,20 @@ pub async fn upload_dbt_profiles_to_buster(
     };
 
     Ok(())
+}
+
+pub async fn get_project_profile() -> Result<(String, Profile)> {
+    let project_config = get_current_project().await?;
+
+    let dbt_profiles = get_dbt_profiles_yml().await?;
+
+    let profile = dbt_profiles
+        .profiles
+        .get(&project_config.profile)
+        .ok_or(anyhow::anyhow!(
+            "Profile not found: {}",
+            project_config.profile
+        ))?;
+
+    Ok((project_config.profile, profile.clone()))
 }
