@@ -68,25 +68,30 @@ pub struct Measure {
 
 pub async fn get_model_files() -> Result<Vec<BusterModelObject>> {
     let mut model_objects = Vec::new();
+    process_directory(std::path::Path::new("models"), &mut model_objects).await?;
+    Ok(model_objects)
+}
 
-    // Walk through models directory recursively
-    let models_dir = std::path::Path::new("models");
-    let mut dir = tokio::fs::read_dir(models_dir).await?;
+async fn process_directory(
+    dir_path: &std::path::Path,
+    model_objects: &mut Vec<BusterModelObject>,
+) -> Result<()> {
+    let mut dir = tokio::fs::read_dir(dir_path).await?;
+
     while let Some(entry) = dir.next_entry().await? {
         let path = entry.path();
 
-        // Check if this is a .yml file
+        if path.is_dir() {
+            Box::pin(process_directory(&path, model_objects)).await?;
+            continue;
+        }
+
         if let Some(ext) = path.extension() {
             if ext == "yml" {
-                // Get corresponding .sql file path
                 let sql_path = path.with_extension("sql");
-
                 if sql_path.exists() {
-                    // Read SQL definition
                     let sql_definition = tokio::fs::read_to_string(&sql_path).await?;
-
-                    // Parse YAML into BusterModel
-                    let yaml_content = fs::read_to_string(path).await?;
+                    let yaml_content = fs::read_to_string(&path).await?;
                     let model: BusterModel = serde_yaml::from_str(&yaml_content)?;
 
                     model_objects.push(BusterModelObject {
@@ -97,14 +102,15 @@ pub async fn get_model_files() -> Result<Vec<BusterModelObject>> {
             }
         }
     }
-
-    Ok(model_objects)
+    Ok(())
 }
 
 pub async fn upload_model_files(
     model_objects: Vec<BusterModelObject>,
     buster_creds: BusterCredentials,
 ) -> Result<()> {
+    println!("Uploading model files to Buster");
+
     // First, get the project profile so we can know where the models were written
     let (profile_name, profile) = get_project_profile().await?;
 
@@ -157,13 +163,14 @@ pub async fn upload_model_files(
                 model: semantic_model.model,
                 schema: schema.clone(),
                 description: semantic_model.description,
+                sql_definition: Some(model.sql_definition.clone()),
                 entity_relationships: Some(entity_relationships),
                 columns,
             };
 
             post_datasets_req_body.push(dataset);
-        };
-    };
+        }
+    }
 
     let buster = BusterClient::new(buster_creds.url, buster_creds.api_key)?;
 

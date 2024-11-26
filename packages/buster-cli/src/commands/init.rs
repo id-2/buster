@@ -141,5 +141,7 @@ pub async fn init() -> Result<()> {
         ));
     }
 
+    // TODO: Get back the ids and store in artifacts.
+
     Ok(())
 }

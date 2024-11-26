@@ -28,6 +28,7 @@ pub struct PostDatasetsRequest {
     pub model: Option<String>,
     pub schema: String,
     pub description: String,
+    pub sql_definition: Option<String>,
     pub entity_relationships: Option<Vec<PostDatasetsEntityRelationshipsRequest>>,
     pub columns: Vec<PostDatasetsColumnsRequest>,
 }
