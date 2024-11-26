@@ -1,7 +1,12 @@
 use anyhow::Result;
-use inquire::Select;
+use inquire::{MultiSelect, Select};
+use tokio::task::JoinSet;
 
-use crate::utils::credentials::get_and_validate_buster_credentials;
+use crate::utils::{
+    command::{check_dbt_installation, dbt_command},
+    credentials::get_and_validate_buster_credentials,
+    project_files::{create_buster_from_dbt_project_yml, find_dbt_projects},
+};
 
 use super::auth;
 
@@ -14,6 +19,8 @@ use super::auth;
 ///   - If not, create a new example project
 
 pub async fn init() -> Result<()> {
+    check_dbt_installation().await?;
+
     // Get buster credentials
     let buster_creds = match get_and_validate_buster_credentials().await {
         Ok(buster_creds) => Some(buster_creds),
@@ -24,41 +31,50 @@ pub async fn init() -> Result<()> {
     };
 
     // If no buster credentials, go through auth flow.
-    let buster_creds = if let None = buster_creds {
+    let buster_creds = if let Some(buster_creds) = buster_creds {
+        buster_creds
+    } else {
         match auth().await {
             Ok(_) => match get_and_validate_buster_credentials().await {
-                Ok(buster_creds) => Some(buster_creds),
+                Ok(buster_creds) => buster_creds,
                 Err(e) => anyhow::bail!("Failed to authenticate: {}", e),
             },
             Err(e) => anyhow::bail!("Failed to authenticate: {}", e),
-        };
+        }
     };
 
-    // check if existing dbt project
-    let dbt_project_exists = match tokio::fs::try_exists("dbt_project.yml").await {
-        Ok(true) => true,
-        Ok(false) => false,
-        Err(e) => anyhow::bail!("Failed to check for dbt project: {}", e),
-    };
+    // Check if dbt projects exist.
+    let dbt_projects = find_dbt_projects().await?;
 
-    // If dbt project, ask if they want to piggyback off the existing project.
-    let use_exising_dbt = if dbt_project_exists {
-        let use_exising_dbt_input = match Select::new(
-            "A dbt project was found. Do you want to use it for Buster?",
-            vec!["Yes", "No"],
+    if !dbt_projects.is_empty() {
+        // If dbt projects exist, ask user which ones to use for Buster.
+        println!("Found already existing dbt projects...");
+        let selected_dbt_projects = MultiSelect::new(
+            "Please select the dbt projects you want to use for Buster (leave empty for all):",
+            dbt_projects,
         )
         .with_vim_mode(true)
-        .prompt()
-        {
-            Ok(ans) if ans == "Yes" => true,
-            Ok(_) => false,
-            Err(e) => anyhow::bail!("Failed to get user input: {}", e),
-        };
+        .prompt()?;
 
-        use_exising_dbt_input
+        let mut dbt_project_set = JoinSet::new();
+
+        for project in selected_dbt_projects {
+            dbt_project_set
+                .spawn(async move { create_buster_from_dbt_project_yml(&project).await });
+        }
+
+        while let Some(result) = dbt_project_set.join_next().await {
+            result??;
+        }
     } else {
-        false
-    };
+        // If no dbt projects exist, create a new one.
+        println!("No dbt projects found. Creating a new dbt project...");
+        dbt_command("init").await?;
+
+        let dbt_projects = find_dbt_projects().await?;
+
+        create_buster_from_dbt_project_yml(&dbt_projects[0]).await?;
+    }
 
     Ok(())
 }
