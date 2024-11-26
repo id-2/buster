@@ -1,5 +1,5 @@
 use anyhow::Result;
-use inquire::{MultiSelect, Select};
+use inquire::MultiSelect;
 use ratatui::style::Stylize;
 use tokio::task::JoinSet;
 
@@ -15,14 +15,6 @@ use super::auth;
 fn print_error(msg: &str) {
     println!("{}", msg.red().bold());
 }
-
-/// Check to make sure that the appropriate credentials are in.
-/// Check to see if an existing dbt project exists.
-///   - If it does, ask if they want to use it for Buster
-///     - If yes:
-///        -
-///     - If no, as if no dbt exists
-///   - If not, create a new example project
 
 pub async fn init() -> Result<()> {
     if let Err(e) = check_dbt_installation().await {
