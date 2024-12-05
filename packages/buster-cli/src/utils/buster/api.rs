@@ -5,20 +5,19 @@ use reqwest::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::{
+    error::BusterError,
+    utils::profiles::{Credential, Profile},
+};
+
+use super::{
+    PostDataSourcesRequest, PostDatasetsRequest, ValidateApiKeyRequest, ValidateApiKeyResponse,
+};
+
 pub struct BusterClient {
     client: Client,
     base_url: String,
     api_key: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ValidateApiKeyResponse {
-    pub valid: bool,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ValidateApiKeyRequest {
-    pub api_key: String,
 }
 
 impl BusterClient {
@@ -53,7 +52,7 @@ impl BusterClient {
             .send()
             .await?;
 
-        if response.status().is_client_error() {
+        if !response.status().is_success() {
             return Err(anyhow::anyhow!(
                 "Failed to validate API key. This could be due to an invalid URL"
             ));
@@ -65,6 +64,54 @@ impl BusterClient {
                 "Failed to parse validate API key response: {}",
                 e
             )),
+        }
+    }
+
+    pub async fn post_data_sources(&self, req_body: Vec<PostDataSourcesRequest>) -> Result<()> {
+        let headers = self.build_headers()?;
+
+        match self
+            .client
+            .post(format!("{}/api/v1/data_sources", self.base_url))
+            .headers(headers)
+            .json(&req_body)
+            .send()
+            .await
+        {
+            Ok(res) => {
+                if !res.status().is_success() {
+                    return Err(anyhow::anyhow!(
+                        "POST /api/v1/data_sources failed: {}",
+                        res.text().await?
+                    ));
+                }
+                Ok(())
+            }
+            Err(e) => Err(anyhow::anyhow!("POST /api/v1/data_sources failed: {}", e)),
+        }
+    }
+
+    pub async fn post_datasets(&self, req_body: Vec<PostDatasetsRequest>) -> Result<()> {
+        let headers = self.build_headers()?;
+
+        match self
+            .client
+            .post(format!("{}/api/v1/datasets", self.base_url))
+            .headers(headers)
+            .json(&req_body)
+            .send()
+            .await
+        {
+            Ok(res) => {
+                if !res.status().is_success() {
+                    return Err(anyhow::anyhow!(
+                        "POST /api/v1/datasets failed: {}",
+                        res.text().await?
+                    ));
+                }
+                Ok(())
+            }
+            Err(e) => Err(anyhow::anyhow!("POST /api/v1/datasets failed: {}", e)),
         }
     }
 }

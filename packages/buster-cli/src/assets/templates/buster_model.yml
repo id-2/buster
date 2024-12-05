@@ -6,12 +6,14 @@ semantic_models:
     model: ref('some_model') ## Required: the database identifier of the table/view/mv that this semantic model relates to.
     defaults: ## Required TODO: figure out exactly what this is.
       agg_time_dimension: dimension_name ## Required if the model contains measures
+    aliases: [] ## Optional field that allows you to alias the semantic model, we will use this to replace the model name in the queries.
     entities:
       - name: <name of the entity> ## Required
         type: Primary or natural or foreign or unique ## Required
         description: A description of the field or role the entity takes in this table ## Optional
         expr: The field that denotes that entity (transaction_id). ## Optional
-        join_type: many-to-one or one-to-one or one-to-many ## Required on foreign entities helps buster understand how to join the entity to the table.
+        join_type: inner ## Required on foreign entities. This helps buster understand how to join the entity to the table. [always_left, inner, full_outer, cross]
+        relationship_type: one_to_one ## Required on foreign entities. This helps buster understand the relationship between the entity and the table. [one_to_one, one_to_many, many_to_one, many_to_many]
     measures:
       - name: <name of the measure>
         description: "same as always" ## Optional
@@ -20,6 +22,7 @@ semantic_models:
         agg_params: "specific aggregation properties such as a percentile" ## Optional
         agg_time_dimension: The time field. Defaults to the default agg time dimension for the semantic model. ##  Optional
         non_additive_dimension: "Use these configs when you need non-additive dimensions." ## Optional
+        alias: ["alias for the measure"] ## Optional
     dimensions:
       - name: <name of the dimension> # Required
         type: Categorical or Time # Required
@@ -27,3 +30,8 @@ semantic_models:
         type_params: Specific type params such as if the time is primary or used as a partition # Required
         description: Same as always # Optional
         expr: The column name or expression. If not provided the default is the dimension name # Optional
+        sql: Can be sql that defines the dimension... like a case statement or something. # Optional
+        searchable: boolean # Optional if toggled to true, we search the dimension values based on the user search.
+        alias: ["alias for the dimension"] # Optional
+        timezone: "America/Los_Angeles" # Optional defaults to UTC.
+

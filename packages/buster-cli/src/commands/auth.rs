@@ -2,7 +2,7 @@ use anyhow::Result;
 use inquire::{Password, Text};
 
 use crate::utils::{
-    credentials::{get_buster_credentials, set_buster_credentials, BusterCredentials},
+    buster_credentials::{get_buster_credentials, set_buster_credentials, BusterCredentials},
     BusterClient,
 };
 

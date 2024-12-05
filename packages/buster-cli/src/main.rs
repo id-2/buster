@@ -15,12 +15,7 @@ pub enum Commands {
     Auth,
     Generate,
     Import,
-    Deploy {
-        #[arg(long, default_value = "false")]
-        dbt_only: bool,
-        #[arg(long, default_value = "false")]
-        buster_only: bool,
-    },
+    Deploy,
 }
 
 #[derive(Parser)]
@@ -39,10 +34,7 @@ async fn main() {
         Commands::Auth => auth().await,
         Commands::Generate => generate().await,
         Commands::Import => import().await,
-        Commands::Deploy {
-            dbt_only,
-            buster_only,
-        } => deploy(dbt_only, buster_only).await,
+        Commands::Deploy => deploy().await,
     };
 
     if let Err(e) = result {
