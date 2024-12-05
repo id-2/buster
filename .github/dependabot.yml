@@ -1,0 +1,7 @@
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/packages/buster-cli"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
