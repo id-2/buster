@@ -2,7 +2,7 @@
 fn test_convert_buster_to_dbt_model() {
     let buster_yaml = r#"
 version: 2
-semantic_models:
+models:
   - name: test_model
     aliases: ["alias1"]
     entities:
@@ -23,7 +23,7 @@ semantic_models:
 "#;
 
     let dbt_yaml = convert_buster_to_dbt_model(buster_yaml).unwrap();
-    
+
     // The converted YAML shouldn't contain Buster-specific fields
     assert!(!dbt_yaml.contains("aliases"));
     assert!(!dbt_yaml.contains("join_type"));
