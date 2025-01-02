@@ -22,23 +22,17 @@ pub struct BusterModelObject {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BusterModel {
     pub version: i32,
-    pub semantic_models: Vec<SemanticModel>,
+    pub models: Vec<Model>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SemanticModel {
+pub struct Model {
     pub name: String,
-    pub defaults: ModelDefaults,
     pub description: String,
     pub model: Option<String>,
     pub entities: Vec<Entity>,
     pub dimensions: Vec<Dimension>,
     pub measures: Vec<Measure>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ModelDefaults {
-    pub agg_time_dimension: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -121,7 +115,7 @@ pub async fn upload_model_files(
 
     // Iterate through each model object and the semantic models within. These are the datasets we want to create.
     for model in model_objects {
-        for semantic_model in model.model_file.semantic_models {
+        for semantic_model in model.model_file.models {
             let mut columns = Vec::new();
 
             for column in semantic_model.dimensions {
@@ -151,7 +145,7 @@ pub async fn upload_model_files(
             for entity in semantic_model.entities {
                 entity_relationships.push(PostDatasetsEntityRelationshipsRequest {
                     name: entity.name,
-                    expr: vec![entity.expr],
+                    expr: entity.expr,
                     type_: entity.entity_type,
                 });
             }

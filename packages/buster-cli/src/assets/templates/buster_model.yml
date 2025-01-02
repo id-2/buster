@@ -1,6 +1,6 @@
 version: 2
 
-semantic_models:
+models:
   - name: the_name_of_the_semantic_model ## Required
     description: same as always ## Optional
     model: ref('some_model') ## Required: the database identifier of the table/view/mv that this semantic model relates to.

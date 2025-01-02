@@ -47,7 +47,7 @@ pub struct PostDatasetsColumnsRequest {
 #[derive(Debug, Serialize)]
 pub struct PostDatasetsEntityRelationshipsRequest {
     pub name: String,
-    pub expr: Vec<String>,
+    pub expr: String,
     #[serde(rename = "type")]
     pub type_: String,
 }
