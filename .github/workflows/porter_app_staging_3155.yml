@@ -40,6 +40,7 @@ jobs:
           aws s3 cp ${{ secrets.CERT_S3_URL }} ~/.postgresql/root.crt
 
       - name: Run migrations
+        working-directory: ./api
         run: diesel migration run
         env:
           DATABASE_URL: ${{ secrets.DB_URL }}
