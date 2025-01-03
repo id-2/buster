@@ -47,8 +47,8 @@ jobs:
           - name: Download SSL certificate from S3
             run: |
               aws s3 cp ${{ secrets.CERT_S3_URL }} ./cert.pem
-              mkdir -p porter/cert
-              cp cert.pem porter/cert/
+              mkdir -p certs/cert
+              cp cert.pem certs/cert/
           - name: Set Github tag
             id: vars
             run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
