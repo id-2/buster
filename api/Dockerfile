@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY cert.pem /usr/local/share/ca-certificates/cert.crt
+COPY porter/cert/cert.pem /usr/local/share/ca-certificates/cert.crt
 RUN update-ca-certificates
 
 COPY --from=builder /app/target/release/bi_api .
