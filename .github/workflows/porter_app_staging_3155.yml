@@ -37,7 +37,7 @@ jobs:
       - name: Download Postgres certificate from S3
         run: |
           mkdir -p ~/.postgresql
-          aws s3 cp ${{ secrets.PG_CERT_S3_URL }} ~/.postgresql/root.crt
+          aws s3 cp ${{ secrets.CERT_S3_URL }} ~/.postgresql/root.crt
 
       - name: Run migrations
         run: diesel migration run
