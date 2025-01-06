@@ -3,8 +3,11 @@ Cypress.Commands.add('loginToBuster', (email = 'chad@buster.so', password = 'pas
   cy.visit('localhost:3000');
   cy.get('#email').clear().type(email);
   cy.get('#password').clear().type(password);
-  cy.get('.mb-1\\.5 > .busterv2-typography').click();
-  cy.get(':nth-child(8) > .busterv2-btn > span').click();
+
+  cy.contains('span', 'Sign in').click();
+
+  cy.contains('button', 'Sign in').click();
+
   cy.wait(2500);
 });
 

@@ -10,7 +10,7 @@
     "cy:run": "npx cypress run --browser chrome"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
