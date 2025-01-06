@@ -21,7 +21,6 @@ pub fn router() -> Router {
 
 pub enum ApiResponse<T> {
     OK,
-    Created,
     NoContent,
     JsonData(T),
 }
