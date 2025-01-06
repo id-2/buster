@@ -10,7 +10,7 @@
     "cy:run": "npx cypress run --browser chrome"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
@@ -26,7 +26,7 @@
     "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
-    "@tanstack/react-query": "^5.62.15",
+    "@tanstack/react-query": "^5.62.16",
     "@vercel/speed-insights": "^1.1.0",
     "ahooks": "^3.8.4",
     "antd": "^5.23.0",
@@ -39,7 +39,6 @@
     "chartjs-chart-matrix": "^2.0.1",
     "chartjs-color": "^2.4.1",
     "chartjs-plugin-annotation": "^3.1.0",
-    "chartjs-plugin-crosshair": "^2.0.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-deferred": "^2.0.0",
     "chartjs-plugin-doughnut-innertext": "^3.1.0",
@@ -65,7 +64,7 @@
     "material-symbols": "^0.27.2",
     "monaco-sql-languages": "^0.12.2",
     "monaco-themes": "^0.4.4",
-    "next": "14.2.15",
+    "next": "14.2.22",
     "next-themes": "^0.4.4",
     "next-transpile-modules": "^10.0.1",
     "papaparse": "^5.4.1",
@@ -74,7 +73,7 @@
     "posthog-js": "^1.204.0",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "rc-virtual-list": "^3.16.1",
+    "rc-virtual-list": "^3.17.0",
     "react": "^18",
     "react-chartjs-2": "^5.3.0",
     "react-data-grid": "^7.0.0-beta.47",
@@ -112,14 +111,14 @@
     "@types/react-resizable": "^3.0.8",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/react-window": "^1.8.8",
-    "@types/uuid": "^9.0.8",
+    "@types/uuid": "^10.0.0",
     "cypress": "^13.17.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "postcss": "~8",
-    "sass": "^1.83.0",
+    "sass": "^1.83.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
