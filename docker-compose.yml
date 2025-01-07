@@ -26,9 +26,7 @@ services:
       - db
 
   web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
+    build: ./web
     ports:
       - "3000:3000"
     environment:
