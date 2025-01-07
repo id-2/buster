@@ -16,7 +16,12 @@ import {
   PieChartAxis,
   ScatterAxis
 } from '@/components/charts';
-import { SimplifiedColumnType, simplifyColumnType } from '@/utils';
+import {
+  isDateColumnType,
+  isNumericColumnType,
+  SimplifiedColumnType,
+  simplifyColumnType
+} from '@/utils';
 import { produce } from 'immer';
 import isEmpty from 'lodash/isEmpty';
 
@@ -121,14 +126,14 @@ const keySpecificHandlers: Partial<
     dataMetadata,
     pieChartAxis
   ) => {
-    if (isEmpty(pieLabelPosition)) {
-      const firstPieColumn = pieChartAxis?.x?.[0];
-      const firstPieColumnMetaData = dataMetadata?.column_metadata?.find(
-        ({ name }) => name === firstPieColumn
-      );
-      const hasMoreThanXRows = (firstPieColumnMetaData?.unique_values || 0) > 6;
-      return !hasMoreThanXRows ? 'inside' : 'none';
-    }
+    // if (isEmpty(pieLabelPosition)) {
+    //   const firstPieColumn = pieChartAxis?.x?.[0];
+    //   const firstPieColumnMetaData = dataMetadata?.column_metadata?.find(
+    //     ({ name }) => name === firstPieColumn
+    //   );
+    //   const hasMoreThanXRows = (firstPieColumnMetaData?.unique_values || 0) > 6;
+    //   return !hasMoreThanXRows ? 'none' : 'none';
+    // }
     return pieLabelPosition;
   }
 };
@@ -237,8 +242,8 @@ const createDefaulColumnLabel = (
 const createDefaultColumnLabelStyle = (
   columnType: SimplifiedColumnType
 ): IColumnLabelFormat['style'] => {
-  if (columnType === 'date') return 'date';
-  if (columnType === 'number') return 'number';
+  if (isDateColumnType(columnType)) return 'date';
+  if (isNumericColumnType(columnType)) return 'number';
   return 'string';
 };
 
