@@ -6,10 +6,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Copy environment variables for build
-COPY .env ./
 COPY next.config.mjs ./
-
 
 # Install dependencies
 RUN npm ci
@@ -34,8 +31,6 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.mjs ./
-# Copy environment files
-COPY --from=builder /app/.env ./
 
 # Expose the port your app runs on
 EXPOSE 3000

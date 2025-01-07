@@ -47,13 +47,14 @@ async fn main() {
     }
 
     let protected_router = Router::new().nest("/api/v1", routes::protected_router());
+    let public_router = Router::new().route("/health", axum::routing::get(|| async { "OK" }));
 
     let (shutdown_tx, _) = broadcast::channel::<()>(1);
     let shutdown_tx = Arc::new(shutdown_tx);
 
     let app = Router::new()
         .merge(protected_router)
-        // .merge(public_router)
+        .merge(public_router)
         .layer(TraceLayer::new_for_http())
         .layer(cors())
         .layer(CompressionLayer::new())
