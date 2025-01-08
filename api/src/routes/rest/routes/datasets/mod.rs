@@ -1,3 +1,4 @@
+mod assets;
 mod list_datasets;
 mod post_datasets;
 
@@ -10,4 +11,5 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_datasets::list_datasets))
         .route("/", post(post_datasets::post_datasets))
+        .nest("/:dataset_id", assets::router())
 }

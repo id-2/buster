@@ -359,8 +359,8 @@ async fn is_organization_admin_or_owner(
         }
     };
 
-    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::Admin
-        || is_organization_admin == UserOrganizationRole::Owner
+    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::WorkspaceAdmin
+        || is_organization_admin == UserOrganizationRole::DataAdmin
     {
         true
     } else {
