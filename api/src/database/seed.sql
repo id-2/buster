@@ -942,7 +942,7 @@ INSERT INTO public.teams (id, name, organization_id, sharing_setting, edit_sql, 
 -- Data for Name: teams_to_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.teams_to_users (team_id, user_id, role, created_at, updated_at, deleted_at) VALUES ('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'admin', '2024-11-05 15:41:13.964456+00', '2024-11-05 15:41:13.964457+00', NULL);
+INSERT INTO public.teams_to_users (team_id, user_id, role, created_at, updated_at, deleted_at) VALUES ('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'manager', '2024-11-05 15:41:13.964456+00', '2024-11-05 15:41:13.964457+00', NULL);
 INSERT INTO public.teams_to_users (team_id, user_id, role, created_at, updated_at, deleted_at) VALUES ('6840fa04-c0d7-4e0e-8d3d-ea9190d93874', '1fe85021-e799-471b-8837-953e9ae06e4c', 'member', '2024-11-05 15:41:13.964458+00', '2024-11-05 15:41:13.964458+00', NULL);
 
 
@@ -981,9 +981,27 @@ INSERT INTO public.terms (id, name, definition, sql_snippet, organization_id, cr
 -- Data for Name: users_to_organizations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.users_to_organizations (user_id, organization_id, role, sharing_setting, edit_sql, upload_csv, export_assets, email_slack_enabled, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by) VALUES ('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'owner', 'public', false, false, false, false, '2024-11-05 15:41:13.958254+00', '2024-11-05 15:41:13.958254+00', NULL, 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', NULL);
-INSERT INTO public.users_to_organizations (user_id, organization_id, role, sharing_setting, edit_sql, upload_csv, export_assets, email_slack_enabled, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by) VALUES ('1fe85021-e799-471b-8837-953e9ae06e4c', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'member', 'team', false, false, false, false, '2024-11-05 15:41:13.958255+00', '2024-11-05 15:41:13.958255+00', NULL, '1fe85021-e799-471b-8837-953e9ae06e4c', '1fe85021-e799-471b-8837-953e9ae06e4c', NULL);
-INSERT INTO public.users_to_organizations (user_id, organization_id, role, sharing_setting, edit_sql, upload_csv, export_assets, email_slack_enabled, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by) VALUES ('6840fa04-c0d7-4e0e-8d3d-ea9190d93874', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'admin', 'public', false, false, false, false, '2024-11-05 15:41:13.958256+00', '2024-11-05 15:41:13.958256+00', NULL, '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', NULL);
+INSERT INTO public.users_to_organizations (
+    user_id, 
+    organization_id, 
+    role, 
+    status,
+    sharing_setting, 
+    edit_sql, 
+    upload_csv, 
+    export_assets, 
+    email_slack_enabled, 
+    created_at, 
+    updated_at, 
+    deleted_at, 
+    created_by, 
+    updated_by, 
+    deleted_by
+) VALUES 
+('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'workspace_admin', 'active', 'public', false, false, false, false, '2024-11-05 15:41:13.958254+00', '2024-11-05 15:41:13.958254+00', NULL, 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', NULL),
+('1fe85021-e799-471b-8837-953e9ae06e4c', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'querier', 'active', 'team', false, false, false, false, '2024-11-05 15:41:13.958255+00', '2024-11-05 15:41:13.958255+00', NULL, '1fe85021-e799-471b-8837-953e9ae06e4c', '1fe85021-e799-471b-8837-953e9ae06e4c', NULL),
+('6840fa04-c0d7-4e0e-8d3d-ea9190d93874', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'data_admin', 'active', 'public', false, false, false, false, '2024-11-05 15:41:13.958256+00', '2024-11-05 15:41:13.958256+00', NULL, '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', NULL);
+
 
 
 --
