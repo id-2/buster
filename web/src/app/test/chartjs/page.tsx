@@ -122,7 +122,7 @@ const columnLabelFormats: Record<string, IColumnLabelFormat> = {
 
 export default function ChartJS() {
   const [category, setCategory] = useState<string[]>([]);
-  const [type, setType] = useState<ChartType>(ChartType.Bar);
+  const [type, setType] = useState<ChartType>(ChartType.Pie);
   const [yAxisScaleType, setYAxisScaleType] = useState<'linear' | 'log'>('linear');
   const [barLayout, setBarLayout] = useState<'vertical' | 'horizontal'>('vertical');
   const [gridLines, setGridLines] = useState<boolean>(true);
@@ -162,7 +162,7 @@ export default function ChartJS() {
       axis: {
         x: ['name'],
         y: ['sales', 'expenses'],
-        tooltip: ['sales', 'name']
+        tooltip: ['employee_count']
       },
       minimumPiePercentage: 5
     };

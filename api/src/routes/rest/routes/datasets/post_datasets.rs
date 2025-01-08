@@ -4,9 +4,7 @@ use chrono::{DateTime, Utc};
 use diesel::{upsert::excluded, ExpressionMethods, QueryDsl, SelectableHelper};
 use diesel_async::RunQueryDsl;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::collections::HashSet;
-use tokio::task::JoinSet;
 use uuid::Uuid;
 
 use crate::{
@@ -18,7 +16,6 @@ use crate::{
     },
     routes::rest::ApiResponse,
     utils::{
-        clients::typesense,
         query_engine::{
             credentials::get_data_source_credentials,
             import_dataset_columns::retrieve_dataset_columns,

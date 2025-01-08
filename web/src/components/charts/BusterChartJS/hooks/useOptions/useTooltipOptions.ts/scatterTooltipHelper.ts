@@ -1,8 +1,7 @@
 import { ITooltipItem } from '@/components/charts/BusterChartTooltip/interfaces';
 import { BusterChartConfigProps } from '@/components/charts/interfaces';
 import type { ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { formatChartLabelDelimiter } from '../../../../commonHelpers';
-import { extractFieldsFromChain } from '@/components/charts/chartHooks';
+import { appendToKeyValueChain, extractFieldsFromChain } from '@/components/charts/chartHooks';
 import { formatChartLabel } from '../../../helpers';
 import { formatLabel } from '@/utils';
 
@@ -25,23 +24,32 @@ export const scatterTooltipHelper = (
     hasCategoryAxis
   );
 
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
+  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
   const dataPointDataIndex = dataPoint.dataIndex;
 
-  const datapointIsInTooltip = tooltipDatasets.some(
-    (dataset) => dataset.label === dataPointDataset.label
-  );
+  let relevantDatasets: ChartDataset[] = [];
 
-  if (!datapointIsInTooltip) {
-    return [];
+  if (hasCategoryAxis) {
+    const dataPointCategory = extractFieldsFromChain(dataPointDataset.label!).at(0)?.value!;
+    relevantDatasets = tooltipDatasets.filter((dataset) => {
+      const datasetCategory = extractFieldsFromChain(dataset.label!).at(0)?.value!;
+      return datasetCategory === dataPointCategory;
+    });
+  } else {
+    relevantDatasets = tooltipDatasets;
   }
 
-  const values = tooltipDatasets.map((dataset) => {
-    const label = dataset.label!;
+  const values = relevantDatasets.map((dataset) => {
+    const label = appendToKeyValueChain(extractFieldsFromChain(dataset.label!).at(-1)!);
     const rawValue = dataset.data[dataPointDataIndex] as number;
     const key = extractFieldsFromChain(label).at(-1)?.key!;
     const formattedValue = formatLabel(rawValue, columnLabelFormats[key]);
-    const formattedLabel = formatChartLabelDelimiter(label, columnLabelFormats);
+    const formattedLabel = formatChartLabel(
+      label,
+      columnLabelFormats,
+      hasMultipleMeasures,
+      hasCategoryAxis
+    );
 
     return {
       formattedValue,
