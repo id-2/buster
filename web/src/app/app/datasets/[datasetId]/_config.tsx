@@ -2,19 +2,19 @@ import { AppMaterialIcons } from '@/components';
 import React from 'react';
 
 export enum DatasetApps {
-  SQL = 'sql',
-  DESCRIPTIONS = 'descriptions',
-  OVERVIEW = 'overview'
+  OVERVIEW = 'overview',
+  PERMISSIONS = 'PERMISSIONS',
+  EDITOR = 'editor'
 }
 
 export const DataSetAppText: Record<DatasetApps, string> = {
   [DatasetApps.OVERVIEW]: 'Overview',
-  [DatasetApps.DESCRIPTIONS]: 'Metadata',
-  [DatasetApps.SQL]: 'SQL Editor'
+  [DatasetApps.PERMISSIONS]: 'Permissions',
+  [DatasetApps.EDITOR]: 'Editor'
 };
 
 export const DataSetAppIcons: Record<DatasetApps, React.ReactNode> = {
   [DatasetApps.OVERVIEW]: <AppMaterialIcons icon="info" />,
-  [DatasetApps.DESCRIPTIONS]: <AppMaterialIcons icon="menu_book" />,
-  [DatasetApps.SQL]: <AppMaterialIcons icon="data_object" />
+  [DatasetApps.PERMISSIONS]: <AppMaterialIcons icon="menu_book" />,
+  [DatasetApps.EDITOR]: <AppMaterialIcons icon="data_object" />
 };

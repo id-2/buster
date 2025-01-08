@@ -1,0 +1,127 @@
+'use client';
+
+import React, { useContext, useEffect, useMemo } from 'react';
+import { Breadcrumb, Button, Divider, Skeleton } from 'antd';
+import Link from 'next/link';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { AppSegmented, AppTooltip, PreventNavigation } from '@/components';
+import { useDatasetContextSelector } from '@/context/Datasets';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { AppContentHeader } from '../../../_components/AppContentHeader';
+import { BreadcrumbSeperator } from '@/styles/context/useBreadcrumbStyles';
+import { SegmentedProps } from 'antd/lib';
+import { DataSetAppIcons, DatasetApps, DataSetAppText } from '../_config';
+import { BusterDataset } from '@/api/busterv2/datasets';
+import { useMemoizedFn } from 'ahooks';
+import { PublishDatasetModal } from '../_PublishModal';
+import { useRouter } from 'next/navigation';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
+import { DatasetBreadcrumb } from './DatasetBreadcrumb';
+import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
+
+export const DatasetsIndividualHeader: React.FC<{
+  selectedApp: DatasetApps;
+  selectedDataset: BusterDataset | undefined;
+  setSQL: (sql: string) => void;
+  sql: string;
+}> = ({ sql, selectedDataset, setSQL, selectedApp }) => {
+  const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
+  const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
+  const showSkeletonLoader = !selectedDataset?.id;
+  const [openPublishModal, setOpenPublishModal] = React.useState(false);
+
+  const isSQLApp = selectedApp === DatasetApps.EDITOR;
+
+  const disablePublish = useMemo(() => {
+    const originalSQL = selectedDataset?.definition || '';
+    return !selectedDataset?.id || !sql || originalSQL === sql;
+  }, [selectedDataset?.definition, sql]);
+
+  const preventNavigation = !disablePublish;
+
+  const onReset = useMemoizedFn(() => {
+    setSQL(selectedDataset?.definition || '');
+  });
+
+  const onClosePublishModal = useMemoizedFn(() => {
+    setOpenPublishModal(false);
+  });
+
+  const onOkayPreventNavigation = useMemoizedFn(async () => {
+    setOpenPublishModal(true);
+  });
+
+  const onCancelPreventNavigation = useMemoizedFn(async () => {
+    setTimeout(() => {
+      onReset();
+    }, 300);
+  });
+
+  const onOpenPublishModal = useMemoizedFn(() => {
+    setOpenPublishModal(true);
+  });
+
+  useHotkeys('d', () => {
+    setOpenNewDatasetModal(true);
+  });
+
+  useHotkeys('p', () => {
+    if (isSQLApp) setOpenPublishModal(true);
+  });
+
+  if (showSkeletonLoader) return <></>;
+
+  return (
+    <>
+      <AppContentHeader className="items-center justify-between space-x-2">
+        <div className="flex items-center space-x-3">
+          <DatasetBreadcrumb datasetName={selectedDataset?.name} />
+
+          <DatasetsHeaderOptions
+            isAdmin={isAdmin}
+            selectedApp={selectedApp}
+            datasetId={selectedDataset?.id || ''}
+          />
+        </div>
+
+        <div className="flex items-center">
+          <div className="flex items-center">
+            <DatasetIndividualThreeDotMenu />
+
+            <Divider type="vertical" className="!h-4" />
+
+            <div className="flex items-center space-x-2">
+              <Button type="text" onClick={onReset} disabled={sql === selectedDataset?.definition}>
+                Reset
+              </Button>
+              <AppTooltip title={'Open publish dataset'} shortcuts={['p']}>
+                <Button type="primary" disabled={disablePublish} onClick={onOpenPublishModal}>
+                  Publish
+                </Button>
+              </AppTooltip>
+            </div>
+          </div>
+        </div>
+      </AppContentHeader>
+
+      <PublishDatasetModal
+        open={openPublishModal}
+        selectedDataset={selectedDataset}
+        sql={sql}
+        onClose={onClosePublishModal}
+      />
+
+      <PreventNavigation
+        isDirty={preventNavigation}
+        title="Would you like to publish your changes to this dataset?"
+        description="You are about to leave this page without publishing changes. Would you like to publish your changes before you leave?"
+        okText="Publish changes"
+        cancelText="Discard changes"
+        onOk={onOkayPreventNavigation}
+        onCancel={onCancelPreventNavigation}
+        doNotLeavePageOnOkay
+      />
+    </>
+  );
+};
