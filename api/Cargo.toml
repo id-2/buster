@@ -88,6 +88,7 @@ tokio-postgres-rustls = "0.13"
 tokio-postgres = "0.7"
 futures-util = "0.3"
 rayon = "1.10.0"
+diesel_migrations = "2.0.0"
 
 [profile.release]
 debug = false

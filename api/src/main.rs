@@ -9,11 +9,16 @@ use std::sync::Arc;
 
 use axum::{middleware, Extension, Router};
 use buster_middleware::{auth::auth, cors::cors};
+use database::lib::get_pg_pool;
+use diesel::{Connection, PgConnection};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use dotenv::dotenv;
 use rustls::crypto::ring;
 use tokio::sync::broadcast;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 #[tokio::main]
 #[allow(unused)]
@@ -45,6 +50,15 @@ async fn main() {
         tracing::error!("Failed to initialize global pools: {}", e);
         return;
     }
+
+    tracing::info!("Running database migrations");
+
+    if let Err(e) = run_migrations().await {
+        tracing::error!("Failed to run database migrations: {}", e);
+        return;
+    }
+
+    tracing::info!("Successfully ran database migrations");
 
     let protected_router = Router::new().nest("/api/v1", routes::protected_router());
     let public_router = Router::new().route("/health", axum::routing::get(|| async { "OK" }));
@@ -82,4 +96,18 @@ async fn main() {
             shutdown_tx.send(()).unwrap_or_default();
         }
     }
+}
+
+async fn run_migrations() -> Result<(), anyhow::Error> {
+    let database_url = std::env::var("DATABASE_URL")
+        .map_err(|e| anyhow::anyhow!("Failed to get DATABASE_URL: {}", e))?;
+
+    let mut connection = PgConnection::establish(&database_url)
+        .map_err(|e| anyhow::anyhow!("Failed to establish database connection: {}", e))?;
+
+    connection
+        .run_pending_migrations(MIGRATIONS)
+        .map_err(|e| anyhow::anyhow!("Failed to run migrations: {}", e))?;
+
+    Ok(())
 }

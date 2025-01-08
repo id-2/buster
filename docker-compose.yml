@@ -14,9 +14,7 @@ services:
       retries: 30
 
   api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
+    build: ./api
     env_file:
       - .env
     ports:

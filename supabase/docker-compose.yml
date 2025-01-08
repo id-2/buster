@@ -8,6 +8,14 @@
 name: supabase
 
 services:
+  mail:
+    container_name: supabase-mail
+    image: inbucket/inbucket:3.0.3
+    ports:
+      - '2500:2500' # SMTP
+      - '9000:9000' # web interface
+      - '1100:1100' # POP3
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:20241202-71e5240
