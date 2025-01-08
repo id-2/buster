@@ -53,8 +53,8 @@ pub async fn modeling_query_engine(
         .filter(data_sources::id.eq(data_source_id))
         .filter(
             users_to_organizations::role
-                .eq(UserOrganizationRole::Admin)
-                .or(users_to_organizations::role.eq(UserOrganizationRole::Owner)),
+                .eq(UserOrganizationRole::WorkspaceAdmin)
+                .or(users_to_organizations::role.eq(UserOrganizationRole::DataAdmin)),
         )
         .select(users_to_organizations::user_id)
         .first::<Uuid>(&mut conn)

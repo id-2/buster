@@ -112,6 +112,50 @@ impl AssetPermissionRole {
     diesel::AsExpression,
     diesel::FromSqlRow,
 )]
+#[diesel(sql_type = sql_types::UserOrganizationStatusEnum)]
+#[serde(rename_all = "camelCase")]
+pub enum UserOrganizationStatus {
+    Active,
+    Inactive,
+    Pending,
+    Guest,
+}
+
+impl ToSql<sql_types::UserOrganizationStatusEnum, Pg> for UserOrganizationStatus {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
+        match *self {
+            UserOrganizationStatus::Active => out.write_all(b"active")?,
+            UserOrganizationStatus::Inactive => out.write_all(b"inactive")?,
+            UserOrganizationStatus::Pending => out.write_all(b"pending")?,
+            UserOrganizationStatus::Guest => out.write_all(b"guest")?,
+        }
+        Ok(IsNull::No)
+    }
+}
+
+impl FromSql<sql_types::UserOrganizationStatusEnum, Pg> for UserOrganizationStatus {
+    fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
+        match bytes.as_bytes() {
+            b"active" => Ok(UserOrganizationStatus::Active),
+            b"inactive" => Ok(UserOrganizationStatus::Inactive),
+            b"pending" => Ok(UserOrganizationStatus::Pending),
+            b"guest" => Ok(UserOrganizationStatus::Guest),
+            _ => Err("Unrecognized enum variant".into()),
+        }
+    }
+}
+
+#[derive(
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    diesel::AsExpression,
+    diesel::FromSqlRow,
+)]
 #[diesel(sql_type = sql_types::StoredValuesStatusEnum)]
 #[serde(rename_all = "camelCase")]
 pub enum StoredValuesStatus {

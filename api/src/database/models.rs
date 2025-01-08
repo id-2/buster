@@ -443,6 +443,7 @@ pub struct UserToOrganization {
     pub created_by: Uuid,
     pub updated_by: Uuid,
     pub deleted_by: Option<Uuid>,
+    pub status: UserOrganizationStatus,
 }
 
 #[derive(Queryable, Insertable, Associations, Debug)]

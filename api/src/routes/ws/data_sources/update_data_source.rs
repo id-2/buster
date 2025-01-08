@@ -128,8 +128,8 @@ async fn update_data_source_handler(
         .filter(data_sources::deleted_at.is_null())
         .filter(
             users_to_organizations::role
-                .eq(UserOrganizationRole::Owner)
-                .or(users_to_organizations::role.eq(UserOrganizationRole::Admin)),
+                .eq(UserOrganizationRole::WorkspaceAdmin)
+                .or(users_to_organizations::role.eq(UserOrganizationRole::DataAdmin)),
         )
         .filter(users_to_organizations::user_id.eq(user_id))
         .first::<Uuid>(&mut conn)

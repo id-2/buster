@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        enums::{SharingSetting, UserOrganizationRole},
+        enums::{SharingSetting, UserOrganizationRole, UserOrganizationStatus},
         lib::get_pg_pool,
         models::{Organization, User, UserToOrganization},
         schema::{organizations, users_to_organizations},
@@ -86,7 +86,7 @@ async fn post_organization_handler(user: &User, name: String) -> Result<UserInfo
     let organization_user = UserToOrganization {
         user_id: user.id.clone(),
         organization_id: organization.id,
-        role: UserOrganizationRole::Owner,
+        role: UserOrganizationRole::WorkspaceAdmin,
         sharing_setting: SharingSetting::Public,
         edit_sql: true,
         upload_csv: true,
@@ -98,6 +98,7 @@ async fn post_organization_handler(user: &User, name: String) -> Result<UserInfo
         created_by: user.id.clone(),
         updated_by: user.id.clone(),
         deleted_by: None,
+        status: UserOrganizationStatus::Active,
     };
 
     let mut conn = get_pg_pool().get().await?;
