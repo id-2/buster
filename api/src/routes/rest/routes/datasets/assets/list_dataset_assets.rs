@@ -25,6 +25,8 @@ pub struct AssetWithAssignment {
     pub assigned: bool,
 }
 
+// TODO: When we introduce the dataset groups, this list should look for where they are included, not related to permissions.
+
 pub async fn list_assets(
     Extension(user): Extension<User>,
     Path((dataset_id, permission_type)): Path<(Uuid, String)>,
