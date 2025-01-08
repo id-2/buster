@@ -3,22 +3,33 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Only keep build-time public env vars as args
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_URL
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Set public env vars for build time
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Copy all necessary files first
 COPY package*.json ./
-
 COPY next.config.mjs ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source code
+COPY tsconfig*.json ./
+COPY public ./public
 COPY . .
 
-# Build the Next.js application
-RUN npm run build
+# Install dependencies with verbose logging
+RUN npm ci
+
+# Build with verbose output
+RUN npm run build --verbose
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM node:20-alpine
 
 WORKDIR /app
 
