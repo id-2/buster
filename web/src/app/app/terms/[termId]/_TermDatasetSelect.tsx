@@ -7,6 +7,7 @@ import { createStyles } from 'antd-style';
 import React, { useContext, useMemo } from 'react';
 import { Button } from 'antd';
 import { Text } from '@/components';
+import { useGetDatasets } from '@/api/busterv2/datasets';
 
 const useStyles = createStyles(({ token, css }) => ({
   datasetItem: css`
@@ -38,11 +39,6 @@ export const DatasetList: React.FC<{
   onChange: (datasets: string[]) => void;
 }> = React.memo(({ onChange, termId, selectedDatasets }) => {
   const { styles, cx } = useStyles();
-  const initDatasetsList = useDatasetContextSelector((state) => state.initDatasetsList);
-
-  useMount(() => {
-    initDatasetsList({ threadModalView: false });
-  });
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -76,7 +72,7 @@ const DropdownSelect: React.FC<{
   onChange: (datasets: string[]) => void;
   placement?: AppDropdownSelectProps['placement'];
 }> = ({ onChange, children, datasets, placement = 'bottomRight' }) => {
-  const datasetsList = useDatasetContextSelector((state) => state.datasetsList);
+  const { data: datasetsList } = useGetDatasets();
 
   const itemsDropdown = useMemo(() => {
     return datasetsList.map((item) => ({

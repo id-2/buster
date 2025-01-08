@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDataSourceContextSelector } from '@/context/DataSources';
 import { CircleSpinnerLoaderContainer, Text, Title } from '@/components';
 import { useAntToken } from '@/styles/useAntToken';
@@ -7,11 +7,12 @@ import { InputRef, Input, Button, ConfigProvider } from 'antd';
 import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
 import { Card, List } from 'antd';
 import { createStyles } from 'antd-style';
-import { useMemoizedFn, useMount } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
+import { useGetDatasets } from '@/api/busterv2/datasets';
 
 export const NewDatasetInput: React.FC<{
   selectedDatasource: string;
@@ -203,8 +204,9 @@ const ChooseFromExistingDatasetFrame: React.FC<{
   selectedDatasource: string;
 }> = ({ setSelectFromExisting, selectedDatasource }) => {
   const { styles, cx } = useStyles();
-  const initImportedDatasets = useDatasetContextSelector((state) => state.initImportedDatasets);
-  const importedDatasets = useDatasetContextSelector((state) => state.importedDatasets);
+  const { data: importedDatasets, isFetched: isFetchedDatasets } = useGetDatasets({
+    imported: true
+  });
   const onUpdateDataset = useDatasetContextSelector((state) => state.onUpdateDataset);
   const [loading, setLoading] = useState(importedDatasets.length === 0);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
@@ -225,14 +227,6 @@ const ChooseFromExistingDatasetFrame: React.FC<{
     } catch (error) {
       setSubmittingId(null);
     }
-  });
-
-  useMount(async () => {
-    setLoading(true);
-    if (importedDatasets.length === 0) {
-      await initImportedDatasets();
-    }
-    setLoading(false);
   });
 
   const datasetComputed = useMemo(() => {

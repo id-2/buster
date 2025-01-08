@@ -1,17 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Breadcrumb, Button } from 'antd';
 import Link from 'next/link';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { AppMaterialIcons, AppTooltip } from '@/components';
+import { AppMaterialIcons, AppSegmented, AppTooltip } from '@/components';
 import { NewDatasetModal } from './_NewDatasetModal';
 import { AppContentHeader } from '../_components/AppContentHeader';
 import { useDatasetContextSelector, useIndividualDataset } from '@/context/Datasets';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useUserConfigContextSelector } from '@/context/Users';
 
-export const DatasetHeader: React.FC<{}> = React.memo(() => {
+export const DatasetHeader: React.FC<{
+  datasetFilter: 'all' | 'published' | 'drafts';
+  setDatasetFilter: (filter: 'all' | 'published' | 'drafts') => void;
+}> = React.memo(({ datasetFilter, setDatasetFilter }) => {
   const openedDatasetId = useDatasetContextSelector((state) => state.openedDatasetId);
   const openNewDatasetModal = useDatasetContextSelector((state) => state.openNewDatasetModal);
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
@@ -19,24 +22,28 @@ export const DatasetHeader: React.FC<{}> = React.memo(() => {
   const { dataset } = useIndividualDataset({ datasetId: openedDatasetId });
   const datasetTitle = dataset?.name || 'Datasets';
 
-  const breadcrumbItems = [
-    {
-      title: (
-        <Link
-          suppressHydrationWarning
-          href={
-            openedDatasetId
-              ? createBusterRoute({
-                  route: BusterRoutes.APP_DATASETS_ID_OVERVIEW,
-                  datasetId: openedDatasetId
-                })
-              : createBusterRoute({ route: BusterRoutes.APP_DATASETS })
-          }>
-          {datasetTitle}
-        </Link>
-      )
-    }
-  ].filter((item) => item.title);
+  const breadcrumbItems = useMemo(
+    () =>
+      [
+        {
+          title: (
+            <Link
+              suppressHydrationWarning
+              href={
+                openedDatasetId
+                  ? createBusterRoute({
+                      route: BusterRoutes.APP_DATASETS_ID_OVERVIEW,
+                      datasetId: openedDatasetId
+                    })
+                  : createBusterRoute({ route: BusterRoutes.APP_DATASETS })
+              }>
+              {datasetTitle}
+            </Link>
+          )
+        }
+      ].filter((item) => item.title),
+    [openedDatasetId, datasetTitle]
+  );
 
   useHotkeys('d', () => {
     setOpenNewDatasetModal(true);
@@ -45,12 +52,9 @@ export const DatasetHeader: React.FC<{}> = React.memo(() => {
   return (
     <>
       <AppContentHeader className="items-center justify-between space-x-2">
-        <div className="flex space-x-1">
+        <div className="flex space-x-3">
           <Breadcrumb className="flex items-center" items={breadcrumbItems} />
-          {/* <DatasetFilters
-            activeFilters={dashboardListFilters}
-            onChangeFilter={onSetDatasetListFilters}
-          /> */}
+          <DatasetFilters datasetFilter={datasetFilter} setDatasetFilter={setDatasetFilter} />
         </div>
 
         <div className="flex items-center">
@@ -74,3 +78,27 @@ export const DatasetHeader: React.FC<{}> = React.memo(() => {
   );
 });
 DatasetHeader.displayName = 'DatasetHeader';
+
+const DatasetFilters: React.FC<{
+  datasetFilter: 'all' | 'published' | 'drafts';
+  setDatasetFilter: (filter: 'all' | 'published' | 'drafts') => void;
+}> = ({ datasetFilter, setDatasetFilter }) => {
+  const options: { label: string; value: 'all' | 'published' | 'drafts' }[] = useMemo(
+    () => [
+      { label: 'All', value: 'all' },
+      { label: 'Published', value: 'published' },
+      { label: 'Drafts', value: 'drafts' }
+    ],
+    []
+  );
+
+  return (
+    <AppSegmented
+      options={options}
+      value={datasetFilter}
+      onChange={(value) => {
+        setDatasetFilter(value as 'all' | 'published' | 'drafts');
+      }}
+    />
+  );
+};

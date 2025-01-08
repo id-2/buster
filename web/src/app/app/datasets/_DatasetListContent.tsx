@@ -7,10 +7,10 @@ import { BusterUserAvatar } from '@/components';
 import { formatDate } from '@/utils';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterDatasetListItem } from '@/api/busterv2/datasets';
+import { BusterDatasetListItem, useGetDatasets } from '@/api/busterv2/datasets';
 import { ListEmptyState } from '../_components/Lists/ListEmptyState';
 import { useDatasetContextSelector } from '@/context/Datasets';
-import { useMemoizedFn, useMount } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { DatasetSelectedOptionPopup } from './[datasetId]/_DatasetSelectedPopup';
 
 const columns: BusterListColumn[] = [
@@ -57,13 +57,12 @@ const columns: BusterListColumn[] = [
   }
 ];
 
-export const DatasetListContent: React.FC<{}> = () => {
-  const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
-  const datasetsList = useDatasetContextSelector((state) => state.datasetsList);
-  const loadingDatasets = useDatasetContextSelector((state) => state.loadingDatasets);
+export const DatasetListContent: React.FC<{
+  datasetsList: BusterDatasetListItem[];
+  isFetchedDatasets: boolean;
+  isAdmin: boolean;
+}> = ({ datasetsList, isFetchedDatasets, isAdmin }) => {
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
-  const initDatasetsList = useDatasetContextSelector((state) => state.initDatasetsList);
-  const fetchedAt = useDatasetContextSelector((state) => state.fetchedAt);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
@@ -84,13 +83,6 @@ export const DatasetListContent: React.FC<{}> = () => {
     setOpenNewDatasetModal(true);
   });
 
-  useMount(() => {
-    const fetchedLessThanXSecondsAgo = fetchedAt.current + 3000 > Date.now();
-    if (!fetchedLessThanXSecondsAgo) {
-      initDatasetsList({ threadModalView: false });
-    }
-  });
-
   return (
     <>
       <AppContent>
@@ -100,7 +92,7 @@ export const DatasetListContent: React.FC<{}> = () => {
           selectedRowKeys={selectedRowKeys}
           onSelectChange={setSelectedRowKeys}
           emptyState={
-            loadingDatasets ? (
+            !isFetchedDatasets ? (
               <></>
             ) : (
               <ListEmptyState

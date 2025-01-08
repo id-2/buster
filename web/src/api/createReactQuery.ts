@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useSupabaseContext } from "@/context/Supabase/SupabaseContextProvider";
+import { useSupabaseContext } from '@/context/Supabase/SupabaseContextProvider';
 import {
   useQueryClient,
   useMutation,
   useQuery,
   UseQueryOptions,
   keepPreviousData,
-} from "@tanstack/react-query";
+  useInfiniteQuery
+} from '@tanstack/react-query';
 
 export interface BaseCreateQueryProps {
   refetchOnWindowFocus?: boolean;
@@ -42,7 +43,7 @@ export const useCreateReactQuery = <T>({
     retry: 1,
     refetchOnWindowFocus,
     refetchOnMount,
-    ...rest,
+    ...rest
     // onError: (error) => {
     //   openErrorNotification(error);
     // },
@@ -54,7 +55,7 @@ export const useCreateReactQuery = <T>({
   //   }
   // }, [q?.error]);
 
-  return q;
+  return q as QueryReturnType<T>;
 };
 
 export const useResetReactQuery = () => {
@@ -76,7 +77,7 @@ interface CreateMutationProps<T, V> {
 export const useCreateReactMutation = <T, V>({
   mutationFn,
   onSuccess,
-  onError,
+  onError
 }: CreateMutationProps<T, V>) => {
   return useMutation({ mutationFn, onSuccess, onError });
 };
@@ -84,7 +85,13 @@ export const useCreateReactMutation = <T, V>({
 interface PaginatedQueryProps<T> extends CreateQueryProps<T> {
   page?: number;
   pageSize?: number;
+  initialData?: T;
 }
+
+// Add a type helper to handle the return type
+type QueryReturnType<T> = Omit<ReturnType<typeof useQuery>, 'data'> & {
+  data: T;
+};
 
 export const useCreateReactQueryPaginated = <T>({
   queryKey,
@@ -94,10 +101,10 @@ export const useCreateReactQueryPaginated = <T>({
   initialData,
   refetchOnWindowFocus = false,
   refetchOnMount = true,
-  page = 1,
+  page = 0,
   pageSize = 25,
   ...rest
-}: PaginatedQueryProps<T> & BaseCreateQueryProps) => {
+}: PaginatedQueryProps<T> & BaseCreateQueryProps): QueryReturnType<T> => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const baseEnabled = isUseSession ? !!accessToken : true;
 
@@ -110,6 +117,30 @@ export const useCreateReactQueryPaginated = <T>({
     refetchOnWindowFocus,
     refetchOnMount,
     placeholderData: keepPreviousData,
+    ...rest
+  }) as QueryReturnType<T>;
+};
+
+type InfiniteQueryReturnType<T> = Omit<ReturnType<typeof useInfiniteQuery>, 'data'> & {
+  data: T;
+};
+
+export const useCreateReactInfiniteQuery = <T>({
+  queryKey,
+  queryFn,
+  enabled = true,
+  initialPageParam = 0,
+  getNextPageParam,
+  ...rest
+}: Parameters<typeof useInfiniteQuery>[0] & BaseCreateQueryProps) => {
+  const accessToken = useSupabaseContext((state) => state.accessToken);
+  const baseEnabled = !!accessToken;
+
+  return useInfiniteQuery({
     ...rest,
-  });
+    queryKey: [...queryKey],
+    getNextPageParam,
+    initialPageParam,
+    enabled: baseEnabled && !!enabled
+  }) as InfiniteQueryReturnType<T>;
 };

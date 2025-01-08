@@ -35,9 +35,7 @@ export const ListEmptyState: React.FC<{
             type="default"
             icon={<AppMaterialIcons icon="add" />}
             loading={loading}
-            onClick={() => {
-              onClick();
-            }}>
+            onClick={onClick}>
             {buttonText}
           </Button>
         )}

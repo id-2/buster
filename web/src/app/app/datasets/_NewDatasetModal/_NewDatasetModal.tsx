@@ -3,16 +3,14 @@ import { Button, Select, SelectProps } from 'antd';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useDataSourceContextSelector } from '@/context/DataSources';
-import { BusterDataset, BusterDatasetListItem } from '@/api/busterv2/datasets';
+import { BusterDataset, BusterDatasetListItem, useGetDatasets } from '@/api/busterv2/datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useRouter } from 'next/navigation';
-import { AppModal, CircleSpinnerLoaderContainer, Text } from '@/components';
+import { AppModal, Text } from '@/components';
 import { useAntToken } from '@/styles/useAntToken';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { formatDate } from '@/utils/date';
-import { DataSourceListItem } from '@/api/busterv2';
-import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
 import { timeout } from '@/utils';
 
 export const NewDatasetModal: React.FC<{
@@ -156,13 +154,13 @@ const SelectFromExistingDataset: React.FC<{
   selectedDatasource: string;
 }> = React.memo(({ selectedDatasource }) => {
   const token = useAntToken();
-  const initImportedDatasets = useDatasetContextSelector((state) => state.initImportedDatasets);
-  const importedDatasets = useDatasetContextSelector((state) => state.importedDatasets);
+  const { data: importedDatasets, isFetched: isFetchedDatasets } = useGetDatasets({
+    imported: true
+  });
   const onUpdateDataset = useDatasetContextSelector((state) => state.onUpdateDataset);
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
 
   const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const columns: BusterListColumn[] = useMemo(() => {
     return [
@@ -218,14 +216,6 @@ const SelectFromExistingDataset: React.FC<{
     }
   });
 
-  useMount(async () => {
-    setLoading(true);
-    if (importedDatasets.length === 0) {
-      await initImportedDatasets();
-    }
-    setLoading(false);
-  });
-
   return (
     <div
       className="mt-3 flex h-[250px] w-full flex-col"
@@ -248,7 +238,7 @@ const SelectFromExistingDataset: React.FC<{
           rows={rows}
           showHeader={false}
           emptyState={
-            !loading ? (
+            !isFetchedDatasets ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Text>No datasets found</Text>
               </div>

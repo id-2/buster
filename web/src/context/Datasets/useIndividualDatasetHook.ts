@@ -4,20 +4,14 @@ import {
   DatasetUpdateEmit,
   DatasetUpdateColumnEmit
 } from '@/api/buster-socket/datasets';
-import { BusterDataset, BusterDatasetListItem } from '@/api/busterv2/datasets';
+import { BusterDataset } from '@/api/busterv2/datasets';
 import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { useState, useRef } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useBusterNotifications } from '../BusterNotifications';
 import { useDatasetContextSelector } from './DatasetProvider';
 
-export const useIndividualDatasetHook = ({
-  initDatasetsList,
-  setDatasetsList
-}: {
-  initDatasetsList: (d: { threadModalView: boolean }) => void;
-  setDatasetsList: React.Dispatch<React.SetStateAction<BusterDatasetListItem[]>>;
-}) => {
+export const useIndividualDatasetHook = ({}: {}) => {
   const busterSocket = useBusterWebSocket();
 
   const { openConfirmModal } = useBusterNotifications();
@@ -70,8 +64,6 @@ export const useIndividualDatasetHook = ({
       }
     });
 
-    initDatasetsList({ threadModalView: false });
-
     return res as BusterDataset;
   });
 
@@ -92,9 +84,7 @@ export const useIndividualDatasetHook = ({
               delete newDatasets[datasetId];
               return newDatasets;
             });
-            setDatasetsList((prevDatasetsList) => {
-              return prevDatasetsList.filter((dataset) => dataset.id !== datasetId);
-            });
+            console.log('delete dataset', datasetId);
           }
         }
       });
