@@ -18,9 +18,9 @@ export const useUserConfigProvider = ({ userInfo }: { userInfo: BusterUserRespon
   const { openSuccessMessage } = useBusterNotifications();
   const isAnonymousUser = useSupabaseContext((state) => state.isAnonymousUser);
   const accessToken = useSupabaseContext((state) => state.accessToken);
+
   const [userResponse, setUserResponse] = useState<BusterUserResponse | null>(userInfo);
-  const useMountedUser = useRef(false);
-  const [userPalettes, setUserPalettes] = React.useState<BusterUserPalette[]>([]);
+
   const user = userResponse?.user;
   const userTeams = userResponse?.teams || [];
   const userOrganizations = userResponse?.organizations[0];
@@ -28,71 +28,8 @@ export const useUserConfigProvider = ({ userInfo }: { userInfo: BusterUserRespon
   const isUserRegistered =
     !!userResponse && !!userResponse?.organizations?.[0]?.id && !!userResponse?.user?.name;
   const isAdmin =
-    userRole === BusterOrganizationRole.owner || userRole === BusterOrganizationRole.admin;
-
-  const allOptions = [
-    ...[], //import { colorOptions as defaultColorOptions } from '@/app/app/_controllers/ThreadController/ThreadControllerEditContent/SidebarChartApp';
-    ...userPalettes.map((p) => ({ id: p.id, colors: p.palette }))
-  ];
-
-  const _onGetInitialUserColorPalettes = useMemoizedFn((palettes: BusterUserPalette[]) => {
-    setUserPalettes(palettes);
-  });
-
-  const _onCreateUserColorPalette = useMemoizedFn((palettes: BusterUserPalette[]) => {
-    return _onGetInitialUserColorPalettes(palettes);
-  });
-
-  const onGetInitialUserColorPalettes = useMemoizedFn(async () => {
-    if (!useMountedUser.current) {
-      busterSocket.emit({
-        route: '/users/colors/list',
-        payload: {}
-      });
-      busterSocket.on({
-        route: '/users/colors/list:listUserColorPalettes',
-        callback: _onGetInitialUserColorPalettes
-      });
-      useMountedUser.current = true;
-    }
-  });
-
-  const createNewPalette = useMemoizedFn(async (colors: string[]) => {
-    const res = busterSocket.emitAndOnce({
-      emitEvent: {
-        route: '/users/colors/post',
-        payload: { color_palette: colors }
-      },
-      responseEvent: {
-        route: '/users/colors/post:createUserColorPalette',
-        callback: _onCreateUserColorPalette
-      }
-    });
-  });
-
-  const updatePalette = useMemoizedFn(async (id: string, colors: string[]) => {
-    const newPalettes = userPalettes.map((p) => {
-      if (p.id === id) {
-        return { ...p, palette: colors };
-      }
-      return p;
-    });
-    setUserPalettes(newPalettes);
-    busterSocket.emit({
-      route: '/users/colors/update',
-      payload: { id, color_palette: colors }
-    });
-  });
-
-  const deletePalette = useMemoizedFn(async (id: string) => {
-    const newPalettes = userPalettes.filter((p) => p.id !== id);
-    setUserPalettes(newPalettes);
-
-    busterSocket.emit({
-      route: '/users/colors/delete',
-      payload: { id }
-    });
-  });
+    userRole === BusterOrganizationRole.DATA_ADMIN ||
+    userRole === BusterOrganizationRole.WORKSPACE_ADMIN;
 
   const inviteUsers = useMemoizedFn(async (emails: string[], team_ids?: string[]) => {
     busterSocket.emit({
@@ -148,19 +85,11 @@ export const useUserConfigProvider = ({ userInfo }: { userInfo: BusterUserRespon
     }
   });
 
-  //TEAM CONFIG
-  // const teamConfig = useTeamConfigProvider();
   const favoriteConfig = useFavoriteProvider();
 
   return {
     onCreateUserOrganization,
     inviteUsers,
-    onGetInitialUserColorPalettes,
-    userPalettes,
-    createNewPalette,
-    updatePalette,
-    deletePalette,
-    allOptions,
     userTeams,
     loadedUserTeams: !!userResponse,
     user,

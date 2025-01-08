@@ -1,4 +1,4 @@
-import useCreateReactQuery from '@/api/createReactQuery';
+import { useCreateReactQuery } from '@/api/createReactQuery';
 import { listAllGoogleFontsFromGoogle } from './requests';
 
 export enum GOOGLE_QUERY_KEYS {

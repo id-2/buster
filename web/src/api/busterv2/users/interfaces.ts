@@ -6,6 +6,18 @@ export interface BusterUserPalette {
   palette: string[];
 }
 
+export enum BusterOrganizationRole {
+  WORKSPACE_ADMIN = 'workspaceAdmin',
+  DATA_ADMIN = 'dataAdmin',
+  QUERIER = 'querier',
+  RESTRICTED_QUERIER = 'restrictedQuerier'
+}
+
+export enum TeamRole {
+  MANAGER = 'manager',
+  MEMBER = 'member'
+}
+
 export interface BusterUserTeam {
   id: string;
   name: string;
@@ -18,7 +30,7 @@ export interface BusterUserTeam {
   updated_at: string;
   created_at: string;
   deleted_at: string | null;
-  role: ShareRole;
+  role: TeamRole;
 }
 
 export interface BusterUserFavorite {
@@ -66,12 +78,6 @@ export interface BusterOrganization {
   name: string;
   updated_at: string;
   role: BusterOrganizationRole;
-}
-
-export enum BusterOrganizationRole {
-  owner = 'owner',
-  admin = 'admin',
-  member = 'member'
 }
 
 export interface BusterUserListItem {

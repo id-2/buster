@@ -248,19 +248,6 @@ const AdminToolsDropdown: React.FC<{
           </Link>
         ),
         icon: <AppMaterialIcons icon="table_view" />
-      },
-      {
-        key: BusterRoutes.APP_USERS,
-        label: (
-          <Link
-            prefetch={true}
-            href={createBusterRoute({
-              route: BusterRoutes.APP_USERS
-            })}>
-            Users & permissions
-          </Link>
-        ),
-        icon: <AppMaterialIcons icon="groups_2" />
       }
     ],
     []

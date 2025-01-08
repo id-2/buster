@@ -1,4 +1,4 @@
-import useCreateReactQuery from '../../createReactQuery';
+import { useCreateReactQuery } from '../../createReactQuery';
 
 enum QUERY_REQUEST_KEYS {
   getCurrencies = 'getCurrencies'
