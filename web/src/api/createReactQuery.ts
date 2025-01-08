@@ -1,9 +1,13 @@
-'use client';
+"use client";
 
-import { useSupabaseContext } from '@/context/Supabase/SupabaseContextProvider';
-import { useMutation, useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useSupabaseContext } from "@/context/Supabase/SupabaseContextProvider";
+import {
+  useQueryClient,
+  useMutation,
+  useQuery,
+  UseQueryOptions,
+  keepPreviousData,
+} from "@tanstack/react-query";
 
 export interface BaseCreateQueryProps {
   refetchOnWindowFocus?: boolean;
@@ -38,17 +42,17 @@ export const useCreateReactQuery = <T>({
     retry: 1,
     refetchOnWindowFocus,
     refetchOnMount,
-    ...rest
+    ...rest,
     // onError: (error) => {
     //   openErrorNotification(error);
     // },
   });
 
-  useEffect(() => {
-    if (q.error) {
-      // openErrorNotification(q.error);
-    }
-  }, [q?.error]);
+  // useEffect(() => {
+  //   if (q.error) {
+  //     // openErrorNotification(q.error);
+  //   }
+  // }, [q?.error]);
 
   return q;
 };
@@ -72,9 +76,40 @@ interface CreateMutationProps<T, V> {
 export const useCreateReactMutation = <T, V>({
   mutationFn,
   onSuccess,
-  onError
+  onError,
 }: CreateMutationProps<T, V>) => {
   return useMutation({ mutationFn, onSuccess, onError });
 };
 
-export default useCreateReactQuery;
+interface PaginatedQueryProps<T> extends CreateQueryProps<T> {
+  page?: number;
+  pageSize?: number;
+}
+
+export const useCreateReactQueryPaginated = <T>({
+  queryKey,
+  queryFn,
+  isUseSession = true,
+  enabled = true,
+  initialData,
+  refetchOnWindowFocus = false,
+  refetchOnMount = true,
+  page = 1,
+  pageSize = 25,
+  ...rest
+}: PaginatedQueryProps<T> & BaseCreateQueryProps) => {
+  const accessToken = useSupabaseContext((state) => state.accessToken);
+  const baseEnabled = isUseSession ? !!accessToken : true;
+
+  return useQuery({
+    queryKey: [...queryKey, { page, pageSize }],
+    queryFn,
+    enabled: baseEnabled && !!enabled,
+    initialData,
+    retry: 1,
+    refetchOnWindowFocus,
+    refetchOnMount,
+    placeholderData: keepPreviousData,
+    ...rest,
+  });
+};

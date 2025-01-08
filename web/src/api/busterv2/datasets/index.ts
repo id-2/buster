@@ -1,2 +1,2 @@
-export * from './interfaces';
-export * from './requests';
+export * from "./responseInterfaces";
+export * from "./requests";
