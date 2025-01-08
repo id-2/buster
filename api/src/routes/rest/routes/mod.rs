@@ -2,6 +2,7 @@ mod api_keys;
 mod assets;
 mod data_sources;
 mod datasets;
+mod permission_groups;
 mod users;
 
 use axum::{middleware, Router};
@@ -15,6 +16,7 @@ pub fn router() -> Router {
             .nest("/assets", assets::router())
             .nest("/datasets", datasets::router())
             .nest("/data_sources", data_sources::router())
+            .nest("/permission_groups", permission_groups::router())
             .route_layer(middleware::from_fn(auth)),
     )
 }
