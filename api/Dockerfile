@@ -22,12 +22,6 @@ RUN apt-get update && apt-get install -y \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-ARG ENVIRONMENT=local
-RUN if [ "$ENVIRONMENT" != "local" ]; then \
-    COPY cert.pem /usr/local/share/ca-certificates/cert.crt && \
-    update-ca-certificates; \
-    fi
-
 COPY --from=builder /app/target/release/bi_api .
 EXPOSE 3001
 ENTRYPOINT ["./bi_api"]
