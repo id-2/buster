@@ -42,6 +42,10 @@ pub mod sql_types {
     pub struct UserOrganizationRoleEnum;
 
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "user_organization_status_enum"))]
+    pub struct UserOrganizationStatusEnum;
+
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "verification_enum"))]
     pub struct VerificationEnum;
 }
@@ -187,6 +191,28 @@ diesel::table! {
 }
 
 diesel::table! {
+    dataset_groups (id) {
+        id -> Uuid,
+        name -> Varchar,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
+        deleted_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
+    dataset_permissions (id) {
+        id -> Uuid,
+        dataset_id -> Uuid,
+        permission_id -> Uuid,
+        permission_type -> Varchar,
+        created_at -> Timestamptz,
+        updated_at -> Timestamptz,
+        deleted_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::DatasetTypeEnum;
 
@@ -210,6 +236,14 @@ diesel::table! {
         updated_at -> Timestamptz,
         deleted_at -> Nullable<Timestamptz>,
         model -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    datasets_to_dataset_groups (dataset_id, dataset_group_id) {
+        dataset_id -> Uuid,
+        dataset_group_id -> Uuid,
+        created_at -> Timestamptz,
     }
 }
 
@@ -300,6 +334,14 @@ diesel::table! {
         deleted_at -> Nullable<Timestamptz>,
         created_by -> Uuid,
         updated_by -> Uuid,
+    }
+}
+
+diesel::table! {
+    permission_groups_to_users (permission_group_id, user_id) {
+        permission_group_id -> Uuid,
+        user_id -> Uuid,
+        created_at -> Timestamptz,
     }
 }
 
@@ -432,6 +474,7 @@ diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::UserOrganizationRoleEnum;
     use super::sql_types::SharingSettingEnum;
+    use super::sql_types::UserOrganizationStatusEnum;
 
     users_to_organizations (user_id, organization_id) {
         user_id -> Uuid,
@@ -448,6 +491,7 @@ diesel::table! {
         created_by -> Uuid,
         updated_by -> Uuid,
         deleted_by -> Nullable<Uuid>,
+        status -> UserOrganizationStatusEnum,
     }
 }
 
@@ -457,14 +501,19 @@ diesel::joinable!(collections -> organizations (organization_id));
 diesel::joinable!(dashboard_versions -> dashboards (dashboard_id));
 diesel::joinable!(dashboards -> organizations (organization_id));
 diesel::joinable!(data_sources -> organizations (organization_id));
+diesel::joinable!(dataset_permissions -> datasets (dataset_id));
 diesel::joinable!(datasets -> data_sources (data_source_id));
 diesel::joinable!(datasets -> organizations (organization_id));
+diesel::joinable!(datasets_to_dataset_groups -> dataset_groups (dataset_group_id));
+diesel::joinable!(datasets_to_dataset_groups -> datasets (dataset_id));
 diesel::joinable!(datasets_to_permission_groups -> datasets (dataset_id));
 diesel::joinable!(datasets_to_permission_groups -> permission_groups (permission_group_id));
 diesel::joinable!(messages -> datasets (dataset_id));
 diesel::joinable!(messages -> threads (thread_id));
 diesel::joinable!(messages -> users (sent_by));
 diesel::joinable!(permission_groups -> organizations (organization_id));
+diesel::joinable!(permission_groups_to_users -> permission_groups (permission_group_id));
+diesel::joinable!(permission_groups_to_users -> users (user_id));
 diesel::joinable!(teams -> organizations (organization_id));
 diesel::joinable!(teams -> users (created_by));
 diesel::joinable!(teams_to_users -> teams (team_id));
@@ -488,13 +537,17 @@ diesel::allow_tables_to_appear_in_same_query!(
     dashboards,
     data_sources,
     dataset_columns,
+    dataset_groups,
+    dataset_permissions,
     datasets,
+    datasets_to_dataset_groups,
     datasets_to_permission_groups,
     entity_relationship,
     messages,
     organizations,
     permission_groups,
     permission_groups_to_identities,
+    permission_groups_to_users,
     sql_evaluations,
     teams,
     teams_to_users,
