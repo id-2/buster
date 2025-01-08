@@ -490,3 +490,14 @@ pub struct EntityRelationship {
     pub relationship_type: String,
     pub created_at: DateTime<Utc>,
 }
+
+#[derive(Queryable, Insertable, Debug)]
+#[diesel(table_name = dataset_groups)]
+pub struct DatasetGroup {
+    pub id: Uuid,
+    pub organization_id: Uuid,
+    pub name: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub deleted_at: Option<DateTime<Utc>>,
+}

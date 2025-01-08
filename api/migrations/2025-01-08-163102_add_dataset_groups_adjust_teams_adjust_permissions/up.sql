@@ -39,6 +39,7 @@ ALTER TABLE users_to_organizations
 -- Create dataset_groups table
 CREATE TABLE dataset_groups (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     name VARCHAR NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -47,6 +48,9 @@ CREATE TABLE dataset_groups (
 
 -- Add index on deleted_at for soft delete queries
 CREATE INDEX dataset_groups_deleted_at_idx ON dataset_groups(deleted_at);
+
+-- Add indexes
+CREATE INDEX dataset_groups_organization_id_idx ON dataset_groups(organization_id);
 
 -- Create datasets_to_dataset_groups join table
 CREATE TABLE datasets_to_dataset_groups (
@@ -73,6 +77,7 @@ CREATE INDEX permission_groups_to_users_user_id_idx ON permission_groups_to_user
 -- Create dataset_permissions table
 CREATE TABLE dataset_permissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     dataset_id UUID NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
     permission_id UUID NOT NULL,
     permission_type VARCHAR NOT NULL CHECK (
@@ -88,6 +93,9 @@ CREATE TABLE dataset_permissions (
 CREATE INDEX dataset_permissions_deleted_at_idx ON dataset_permissions(deleted_at);
 CREATE INDEX dataset_permissions_permission_lookup_idx ON dataset_permissions(permission_id, permission_type);
 CREATE INDEX dataset_permissions_dataset_id_idx ON dataset_permissions(dataset_id);
+
+-- Add indexes
+CREATE INDEX dataset_permissions_organization_id_idx ON dataset_permissions(organization_id);
 
 -- Drop default before type change
 ALTER TABLE teams_to_users ALTER COLUMN role DROP DEFAULT;

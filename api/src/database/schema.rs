@@ -193,6 +193,7 @@ diesel::table! {
 diesel::table! {
     dataset_groups (id) {
         id -> Uuid,
+        organization_id -> Uuid,
         name -> Varchar,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
@@ -203,6 +204,7 @@ diesel::table! {
 diesel::table! {
     dataset_permissions (id) {
         id -> Uuid,
+        organization_id -> Uuid,
         dataset_id -> Uuid,
         permission_id -> Uuid,
         permission_type -> Varchar,
@@ -501,7 +503,9 @@ diesel::joinable!(collections -> organizations (organization_id));
 diesel::joinable!(dashboard_versions -> dashboards (dashboard_id));
 diesel::joinable!(dashboards -> organizations (organization_id));
 diesel::joinable!(data_sources -> organizations (organization_id));
+diesel::joinable!(dataset_groups -> organizations (organization_id));
 diesel::joinable!(dataset_permissions -> datasets (dataset_id));
+diesel::joinable!(dataset_permissions -> organizations (organization_id));
 diesel::joinable!(datasets -> data_sources (data_source_id));
 diesel::joinable!(datasets -> organizations (organization_id));
 diesel::joinable!(datasets_to_dataset_groups -> dataset_groups (dataset_group_id));
