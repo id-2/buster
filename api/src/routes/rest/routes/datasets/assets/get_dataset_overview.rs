@@ -6,6 +6,9 @@ use diesel_async::RunQueryDsl;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::database::enums::IdentityType;
+use crate::database::schema::sql_types::IdentityTypeEnum;
+use crate::database::schema::{datasets, permission_groups, permission_groups_to_identities};
 use crate::database::{
     enums::{UserOrganizationRole, UserOrganizationStatus},
     lib::get_pg_pool,
@@ -75,6 +78,58 @@ pub async fn get_dataset_overview(
             (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
         })?;
 
+    let user_ids = users.iter().map(|(id, _, _)| *id).collect::<Vec<_>>();
+
+    let datasets_query: Vec<(Uuid, String, Uuid)> = dataset_permissions::table
+        .inner_join(datasets::table.on(dataset_permissions::dataset_id.eq(datasets::id)))
+        .filter(dataset_permissions::dataset_id.eq(dataset_id))
+        .filter(dataset_permissions::permission_type.eq("user"))
+        .filter(dataset_permissions::deleted_at.is_null())
+        .filter(dataset_permissions::permission_id.eq_any(&user_ids))
+        .select((
+            datasets::id,
+            datasets::name,
+            dataset_permissions::permission_id,
+        ))
+        .load::<(Uuid, String, Uuid)>(&mut conn)
+        .await
+        .map_err(|e| {
+            tracing::error!("Error getting datasets: {:?}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
+        })?;
+
+    let permission_groups_query: Vec<(Uuid, String, Uuid)> = permission_groups_to_identities::table
+        .inner_join(
+            permission_groups::table
+                .on(permission_groups_to_identities::permission_group_id.eq(permission_groups::id)),
+        )
+        .inner_join(
+            dataset_permissions::table.on(permission_groups_to_identities::permission_group_id
+                .eq(dataset_permissions::permission_id)
+                .and(dataset_permissions::permission_type.eq("permission_group"))),
+        )
+        .filter(permission_groups_to_identities::identity_id.eq_any(&user_ids))
+        .filter(permission_groups_to_identities::identity_type.eq(IdentityType::User))
+        .filter(dataset_permissions::deleted_at.is_null())
+        .filter(dataset_permissions::dataset_id.eq(dataset_id))
+        .filter(permission_groups::deleted_at.is_null())
+        .select((
+            permission_groups::id,
+            permission_groups::name,
+            permission_groups_to_identities::identity_id,
+        ))
+        .load::<(Uuid, String, Uuid)>(&mut conn)
+        .await
+        .map_err(|e| {
+            tracing::error!("Error getting permission groups: {:?}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
+        })?;
+
+    println!("datasets_query: {:?}", datasets_query);
+    println!("permission_groups_query: {:?}", permission_groups_query);
+
+    // TODO: will need to add dataset groups here when we turn them on.
+
     let users = users
         .into_iter()
         .map(|(id, email, role)| {
@@ -132,6 +187,43 @@ pub async fn get_dataset_overview(
             }
 
             lineage.push(org_lineage);
+
+            // Add direct dataset access lineage
+            if let Some((dataset_id, dataset_name, _)) =
+                datasets_query.iter().find(|(_, _, user_id)| *user_id == id)
+            {
+                lineage.push(vec![
+                    UserPermissionLineage {
+                        id: None,
+                        type_: String::from("datasets"),
+                        name: Some(String::from("Datasets")),
+                    },
+                    UserPermissionLineage {
+                        id: Some(*dataset_id),
+                        type_: String::from("datasets"),
+                        name: Some(dataset_name.clone()),
+                    },
+                ]);
+            }
+
+            // Add permission group lineage
+            if let Some((group_id, group_name, _)) = permission_groups_query
+                .iter()
+                .find(|(_, _, user_id)| *user_id == id)
+            {
+                lineage.push(vec![
+                    UserPermissionLineage {
+                        id: None,
+                        type_: String::from("permissionGroups"),
+                        name: Some(String::from("Permission Groups")),
+                    },
+                    UserPermissionLineage {
+                        id: Some(*group_id),
+                        type_: String::from("permissionGroups"),
+                        name: Some(group_name.clone()),
+                    },
+                ]);
+            }
 
             return UserOverviewItem {
                 id,
