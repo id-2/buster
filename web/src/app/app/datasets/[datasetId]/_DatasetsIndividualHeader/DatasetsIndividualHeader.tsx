@@ -7,7 +7,6 @@ import { useDatasetContextSelector } from '@/context/Datasets';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppContentHeader } from '../../../_components/AppContentHeader';
 import { DatasetApps } from '../_config';
-import { BusterDataset } from '@/api/busterv2/datasets';
 import { useMemoizedFn } from 'ahooks';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
@@ -16,34 +15,32 @@ import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
 
 export const DatasetsIndividualHeader: React.FC<{
   selectedApp: DatasetApps;
-  selectedDataset: BusterDataset | undefined;
+  datasetId: string | undefined;
+  datasetSQL: string | undefined;
   setSQL: (sql: string) => void;
-  sql: string;
-}> = ({ sql, selectedDataset, setSQL, selectedApp }) => {
+  sql: string | undefined;
+  datasetName: string | undefined;
+}> = React.memo(({ sql, setSQL, selectedApp, datasetId, datasetSQL, datasetName }) => {
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
-  const showSkeletonLoader = !selectedDataset?.id;
-  const [openPublishModal, setOpenPublishModal] = React.useState(false);
+  const showSkeletonLoader = !datasetId;
 
   const isSQLApp = selectedApp === DatasetApps.EDITOR;
 
   const disablePublish = useMemo(() => {
-    const originalSQL = selectedDataset?.sql || '';
-    return !selectedDataset?.id || !sql || originalSQL === sql;
-  }, [selectedDataset?.sql, sql]);
+    const originalSQL = datasetSQL || '';
+    return !datasetId || !sql || originalSQL === sql;
+  }, [datasetSQL, sql, datasetId]);
 
   const preventNavigation = !disablePublish;
 
   const onReset = useMemoizedFn(() => {
-    setSQL(selectedDataset?.sql || '');
+    setSQL(datasetSQL || '');
   });
 
-  const onClosePublishModal = useMemoizedFn(() => {
-    setOpenPublishModal(false);
-  });
-
-  const onOkayPreventNavigation = useMemoizedFn(async () => {
-    setOpenPublishModal(true);
+  const onPublishDataset = useMemoizedFn(async () => {
+    // setOpenPublishModal(true);
+    alert('TODO: Publish dataset');
   });
 
   const onCancelPreventNavigation = useMemoizedFn(async () => {
@@ -52,16 +49,8 @@ export const DatasetsIndividualHeader: React.FC<{
     }, 300);
   });
 
-  const onOpenPublishModal = useMemoizedFn(() => {
-    setOpenPublishModal(true);
-  });
-
   useHotkeys('d', () => {
     setOpenNewDatasetModal(true);
-  });
-
-  useHotkeys('p', () => {
-    if (isSQLApp) setOpenPublishModal(true);
   });
 
   if (showSkeletonLoader) return <></>;
@@ -70,30 +59,28 @@ export const DatasetsIndividualHeader: React.FC<{
     <>
       <AppContentHeader className="items-center justify-between space-x-2">
         <div className="flex items-center space-x-3">
-          <DatasetBreadcrumb datasetName={selectedDataset?.name} />
+          <DatasetBreadcrumb datasetName={datasetName} />
 
           <DatasetsHeaderOptions
             isAdmin={isAdmin}
             selectedApp={selectedApp}
-            datasetId={selectedDataset?.id || ''}
+            datasetId={datasetId}
           />
         </div>
 
         <div className="flex items-center">
           <div className="flex items-center">
-            <DatasetIndividualThreeDotMenu datasetId={selectedDataset?.id} />
+            <DatasetIndividualThreeDotMenu datasetId={datasetId} />
 
             <Divider type="vertical" className="!h-4" />
 
             <div className="flex items-center space-x-2">
-              <Button type="text" onClick={onReset} disabled={sql === selectedDataset?.sql}>
+              <Button type="text" onClick={onReset} disabled={sql === datasetSQL}>
                 Reset
               </Button>
-              <AppTooltip title={'Open publish dataset'} shortcuts={['p']}>
-                <Button type="primary" disabled={disablePublish} onClick={onOpenPublishModal}>
-                  Publish
-                </Button>
-              </AppTooltip>
+              <Button type="primary" disabled={disablePublish} onClick={onPublishDataset}>
+                Publish
+              </Button>
             </div>
           </div>
         </div>
@@ -105,10 +92,12 @@ export const DatasetsIndividualHeader: React.FC<{
         description="You are about to leave this page without publishing changes. Would you like to publish your changes before you leave?"
         okText="Publish changes"
         cancelText="Discard changes"
-        onOk={onOkayPreventNavigation}
+        onOk={onPublishDataset}
         onCancel={onCancelPreventNavigation}
         doNotLeavePageOnOkay
       />
     </>
   );
-};
+});
+
+DatasetsIndividualHeader.displayName = 'DatasetsIndividualHeader';

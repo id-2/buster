@@ -14,8 +14,8 @@ export enum BusterAppRoutes {
   APP_DATASETS = '/app/datasets',
   APP_DATASETS_ID = '/app/datasets/:datasetId',
   APP_DATASETS_ID_OVERVIEW = '/app/datasets/:datasetId/overview',
-  APP_DATASETS_ID_DESCRIPTIONS = '/app/datasets/:datasetId/descriptions',
-  APP_DATASETS_ID_SQL = '/app/datasets/:datasetId/sql',
+  APP_DATASETS_ID_PERMISSIONS = '/app/datasets/:datasetId/permissions',
+  APP_DATASETS_ID_EDITOR = '/app/datasets/:datasetId/editor',
   APP_TERMS = '/app/terms',
   APP_TERMS_ID = '/app/terms/:termId',
   SETTINGS = '/app/settings',
@@ -92,12 +92,12 @@ export type BusterAppRoutesWithArgs = {
     route: BusterAppRoutes.APP_DATASETS_ID_OVERVIEW;
     datasetId: string;
   };
-  [BusterAppRoutes.APP_DATASETS_ID_DESCRIPTIONS]: {
-    route: BusterAppRoutes.APP_DATASETS_ID_DESCRIPTIONS;
+  [BusterAppRoutes.APP_DATASETS_ID_PERMISSIONS]: {
+    route: BusterAppRoutes.APP_DATASETS_ID_PERMISSIONS;
     datasetId: string;
   };
-  [BusterAppRoutes.APP_DATASETS_ID_SQL]: {
-    route: BusterAppRoutes.APP_DATASETS_ID_SQL;
+  [BusterAppRoutes.APP_DATASETS_ID_EDITOR]: {
+    route: BusterAppRoutes.APP_DATASETS_ID_EDITOR;
     datasetId: string;
   };
   [BusterAppRoutes.APP_COLLECTIONS_ID_THREADS_ID]: {

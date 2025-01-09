@@ -30,7 +30,9 @@ const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <DatasetsIndividualHeader
         selectedApp={selectedApp}
         sql={sql}
-        selectedDataset={dataset}
+        datasetId={dataset?.data?.id}
+        datasetSQL={dataset?.data?.sql}
+        datasetName={dataset?.data?.name}
         setSQL={setSQL}
       />
       <AppContent>{children}</AppContent>

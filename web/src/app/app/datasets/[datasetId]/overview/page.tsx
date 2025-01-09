@@ -8,12 +8,15 @@ import { Divider } from 'antd';
 
 export default function Page() {
   const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
-  const dataset = useDatasetPageContextSelector((state) => state.dataset);
-  const datasetData = useDatasetPageContextSelector((state) => state.datasetData);
-  const isFetchedDataset = useDatasetPageContextSelector((state) => state.isFetchedDataset);
-  const isFetchedDatasetData = useDatasetPageContextSelector((state) => state.isFetchedDatasetData);
+  const datasetRes = useDatasetPageContextSelector((state) => state.dataset);
+  const datasetDataRes = useDatasetPageContextSelector((state) => state.datasetData);
   const sql = useDatasetPageContextSelector((state) => state.sql);
   const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
+
+  const datasetData = datasetDataRes?.data;
+  const dataset = datasetRes?.data;
+  const isFetchedDataset = datasetRes?.isFetched;
+  const isFetchedDatasetData = datasetDataRes?.isFetched;
 
   const showSkeletonLoader = !dataset?.id || !isFetchedDataset;
 

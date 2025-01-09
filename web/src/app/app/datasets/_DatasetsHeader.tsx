@@ -20,7 +20,7 @@ export const DatasetHeader: React.FC<{
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const { dataset } = useIndividualDataset({ datasetId: openedDatasetId });
-  const datasetTitle = dataset?.name || 'Datasets';
+  const datasetTitle = dataset?.data?.name || 'Datasets';
 
   const breadcrumbItems = useMemo(
     () =>
@@ -48,6 +48,8 @@ export const DatasetHeader: React.FC<{
   useHotkeys('d', () => {
     setOpenNewDatasetModal(true);
   });
+
+  console.log(dataset);
 
   return (
     <>

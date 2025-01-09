@@ -12,13 +12,15 @@ import {
 
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
-  const [sql, setSQL] = useState<string>('');
   const datasetResult = useIndividualDataset({ datasetId });
+  const datasetSQL = datasetResult.dataset.data?.sql;
+  const [sql, setSQL] = useState<string>(datasetSQL);
+
   const selectedApp = segments;
 
   useLayoutEffect(() => {
-    setSQL(datasetResult.dataset?.sql || '');
-  }, [datasetResult.dataset?.sql]);
+    setSQL(datasetSQL || '');
+  }, [datasetSQL]);
 
   return { sql, selectedApp, setSQL, ...datasetResult };
 };

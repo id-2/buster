@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import SplitPane, { Pane } from '@/components/layout/SplitPane';
 import { createAutoSaveId } from './helper';
 import Cookies from 'js-cookie';
+import { createStyles } from 'antd-style';
 
 export const AppSplitter: React.FC<{
   leftChildren: React.ReactNode;
@@ -32,7 +33,7 @@ export const AppSplitter: React.FC<{
   defaultLayout,
   leftPanelMinSize,
   rightPanelMinSize,
-  split,
+  split = 'vertical',
   leftPanelMaxSize,
   rightPanelMaxSize,
   allowResize,
@@ -70,6 +71,7 @@ export const AppSplitter: React.FC<{
       hideSplitter={hideSplitter}
       active={active}
       splitterClassName={splitterClassName}
+      splitDirection={split}
     />
   ));
 
@@ -99,7 +101,7 @@ export const AppSplitter: React.FC<{
   });
 
   useEffect(() => {
-    if (preserveSide) {
+    if (preserveSide && !hideSplitter && split === 'vertical') {
       window.addEventListener('resize', onPreserveSide);
       return () => {
         window.removeEventListener('resize', onPreserveSide);
@@ -144,27 +146,50 @@ const AppSplitterSash: React.FC<{
   active: boolean;
   splitterClassName?: string;
   hideSplitter?: boolean;
-}> = React.memo(({ active, splitterClassName = 'w-[0.5px] absolute', hideSplitter = false }) => {
-  const token = useAntToken();
+  splitDirection?: 'vertical' | 'horizontal';
+}> = React.memo(
+  ({ active, splitterClassName = '', hideSplitter = false, splitDirection = 'vertical' }) => {
+    const { styles, cx } = useStyles();
 
-  const splitterStyle = useMemo(() => {
-    return {
-      left: '1px',
-      background: hideSplitter
-        ? active
-          ? token.colorBorder
-          : undefined
-        : active
-          ? token.colorPrimary
-          : token.colorBorder
-    };
-  }, [hideSplitter, active]);
-
-  return (
-    <div
-      className={`h-full cursor-col-resize transition ${splitterClassName}`}
-      style={splitterStyle}
-    />
-  );
-});
+    return (
+      <div
+        className={cx(
+          splitterClassName,
+          styles.splitter,
+          'absolute transition',
+          `cursor-${splitDirection}-resize`,
+          splitDirection === 'vertical' ? 'h-full w-[0.5px]' : 'h-[0.5px] w-full',
+          hideSplitter && 'hide',
+          active && 'active',
+          !active && 'inactive'
+        )}
+      />
+    );
+  }
+);
 AppSplitterSash.displayName = 'AppSplitterSash';
+
+const useStyles = createStyles(({ css, token }) => ({
+  splitter: css`
+    background: ${token.colorPrimary};
+    left: 1px;
+
+    &.hide {
+      background: transparent;
+
+      &.active {
+        background: ${token.colorBorder};
+      }
+    }
+
+    &:not(.hide) {
+      &.active {
+        background: ${token.colorPrimary};
+      }
+
+      &.inactive {
+        background: ${token.colorBorder};
+      }
+    }
+  `
+}));
