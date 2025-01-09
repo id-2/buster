@@ -24,33 +24,6 @@ export const OverviewData: React.FC<{
     return String(value);
   });
 
-  if (!definition) {
-    return (
-      <div className="flex justify-center pt-12">
-        <div
-          className="flex max-w-[300px] flex-col items-center justify-center space-y-5"
-          style={{}}>
-          <div className="flex flex-col items-center space-y-3">
-            <Title level={4}>Build your dataset</Title>
-            <Text
-              type="secondary"
-              className="text-center">{`To build your dataset, you’ll need to create a data model or view with our SQL editor.`}</Text>
-          </div>
-          <Link
-            prefetch
-            href={createBusterRoute({
-              route: BusterRoutes.APP_DATASETS_ID_SQL,
-              datasetId
-            })}>
-            <Button type="default" icon={<AppMaterialIcons icon="add" />}>
-              Build dataset
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className="buster-chart h-full w-full overflow-auto"

@@ -4,6 +4,7 @@ import { createStyles } from 'antd-style';
 import { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { MenuProps } from 'antd/lib';
 import { ExpandIcon } from './ExpandIcon';
+import { useMemoizedFn } from 'ahooks';
 
 export const useMenuGroupStyles = createStyles(({ token, css }) => ({
   container: css`
@@ -68,7 +69,7 @@ export const AppMenuGroupSingle: React.FC<
     selectedKey: string;
     onOpenChange?: MenuProps['onOpenChange'];
   }>
-> = ({ onOpenChange, items, label, selectedKey }) => {
+> = React.memo(({ onOpenChange, items, label, selectedKey }) => {
   const { styles, cx } = useMenuGroupStyles();
 
   const menuItems: CollapseProps['items'] = [
@@ -84,13 +85,15 @@ export const AppMenuGroupSingle: React.FC<
           selectedKeys={[selectedKey]}
           mode="inline"
           items={items}
-          onOpenChange={(v) => {
-            onOpenChange?.(v);
-          }}
+          onOpenChange={onOpenChange}
         />
       )
     }
   ];
+
+  const expandIcon = useMemoizedFn((v) => {
+    return <ExpandIcon {...v} />;
+  });
 
   return (
     <ConfigProvider theme={menuToken}>
@@ -101,10 +104,10 @@ export const AppMenuGroupSingle: React.FC<
         expandIconPosition={'end'}
         items={menuItems}
         bordered={false}
-        expandIcon={(v) => {
-          return <ExpandIcon {...v} />;
-        }}
+        expandIcon={expandIcon}
       />
     </ConfigProvider>
   );
-};
+});
+
+AppMenuGroupSingle.displayName = 'AppMenuGroupSingle';

@@ -9,7 +9,6 @@ import { AppContentHeader } from '../../../_components/AppContentHeader';
 import { DatasetApps } from '../_config';
 import { BusterDataset } from '@/api/busterv2/datasets';
 import { useMemoizedFn } from 'ahooks';
-import { PublishDatasetModal } from '../_PublishModal';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
 import { DatasetBreadcrumb } from './DatasetBreadcrumb';
@@ -82,7 +81,7 @@ export const DatasetsIndividualHeader: React.FC<{
 
         <div className="flex items-center">
           <div className="flex items-center">
-            <DatasetIndividualThreeDotMenu />
+            <DatasetIndividualThreeDotMenu datasetId={selectedDataset?.id} />
 
             <Divider type="vertical" className="!h-4" />
 
@@ -99,13 +98,6 @@ export const DatasetsIndividualHeader: React.FC<{
           </div>
         </div>
       </AppContentHeader>
-
-      <PublishDatasetModal
-        open={openPublishModal}
-        selectedDataset={selectedDataset}
-        sql={sql}
-        onClose={onClosePublishModal}
-      />
 
       <PreventNavigation
         isDirty={preventNavigation}

@@ -7,19 +7,20 @@ import {
   useContextSelector
 } from '@fluentui/react-context-selector';
 import { useIndividualDatasetHook } from './useIndividualDatasetHook';
+import { useMemoizedFn } from 'ahooks';
 
 export const useDatasets = () => {
   const { openedDatasetId } = useParams<{ openedDatasetId: string }>();
   const [openNewDatasetModal, setOpenNewDatasetModal] = useState(false);
 
-  const onUpdateDatasetListItem = (newDataset: BusterDatasetListItem) => {
+  const onUpdateDatasetListItem = useMemoizedFn((newDataset: BusterDatasetListItem) => {
     // setDatasetsList((prevDatasets) => {
     //   return prevDatasets.map((dataset) => {
     //     if (dataset.id === newDataset.id) return newDataset;
     //     return dataset;
     //   });
     // });
-  };
+  });
 
   //INDIVIDUAL DATASET
   const individualOptions = useIndividualDatasetHook({});

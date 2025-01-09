@@ -2,6 +2,7 @@ import { useCreateReactMutation, useCreateReactQuery } from '@/api/createReactQu
 import { createDataset, getDatasetData, getDatasetMetadata, getDatasets } from './requests';
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { useMemoizedFn } from 'ahooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useGetDatasets = (params?: Parameters<typeof getDatasets>[0]) => {
   const queryFn = useMemoizedFn(() => getDatasets(params));
@@ -31,9 +32,25 @@ export const useGetDatasetMetadata = (datasetId: string) => {
 };
 
 export const useCreateDataset = () => {
+  const queryClient = useQueryClient();
   const mutationFn = useMemoizedFn((dataset: BusterDataset) => createDataset(dataset));
-  const onSuccess = useMemoizedFn((data: any) => {});
-  const onError = useMemoizedFn((data: any) => {});
+  const onSuccess = useMemoizedFn((newDataset: BusterDataset) => {
+    console.log('newDataset', newDataset);
+    queryClient.setQueryData<BusterDatasetListItem[]>(['datasets', {}], (oldData) => {
+      //   const newListItem: BusterDatasetListItem = {
+      //     ...newDataset,
+      //     name: newDataset.name,
+      //     created_at: newDataset.created_at,
+      //     updated_at: newDataset.updated_at,
+      //     definition: newDataset.definition,
+      //     owner: '',
+      //   };
+      return oldData;
+    });
+  });
+  const onError = useMemoizedFn((error: any) => {
+    console.error('Failed to create dataset:', error);
+  });
   return useCreateReactMutation({
     mutationFn,
     onSuccess,
