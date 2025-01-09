@@ -2,6 +2,7 @@ mod assets;
 mod deploy_datasets;
 mod get_dataset;
 mod get_dataset_data_sample;
+mod git;
 mod list_datasets;
 mod post_dataset;
 
@@ -21,4 +22,5 @@ pub fn router() -> Router {
             get(get_dataset_data_sample::get_dataset_data_sample),
         )
         .nest("/:dataset_id", assets::router())
+        .nest("/git", git::git_router())
 }

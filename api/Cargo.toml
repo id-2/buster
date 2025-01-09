@@ -90,6 +90,7 @@ futures-util = "0.3"
 rayon = "1.10.0"
 diesel_migrations = "2.0.0"
 serde_yaml = "0.9.34"
+octocrab = "0.42.1"
 
 [profile.release]
 debug = false
