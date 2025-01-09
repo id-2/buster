@@ -6,4 +6,4 @@
         AND a.data_source_id = b.data_source_id;
 
         ALTER TABLE datasets
-        ADD CONSTRAINT datasets_database_name_data_source_id_key UNIQUE (id, database_name, data_source_id);
+        ADD CONSTRAINT datasets_database_name_data_source_id_key UNIQUE (database_name, data_source_id);
