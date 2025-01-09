@@ -26,7 +26,8 @@ pub async fn post_dataset(
     Extension(user): Extension<User>,
     Json(request): Json<PostDatasetReq>,
 ) -> Result<ApiResponse<Dataset>, (axum::http::StatusCode, String)> {
-    let dataset = match post_dataset_handler(&user.id, &request.data_source_id, &request.name).await {
+    let dataset = match post_dataset_handler(&user.id, &request.data_source_id, &request.name).await
+    {
         Ok(dataset) => dataset,
         Err(e) => {
             tracing::error!("Error creating dataset: {:?}", e);
@@ -37,7 +38,11 @@ pub async fn post_dataset(
     Ok(ApiResponse::JsonData(dataset))
 }
 
-async fn post_dataset_handler(user_id: &Uuid, data_source_id: &Uuid, name: &str) -> Result<Dataset> {
+async fn post_dataset_handler(
+    user_id: &Uuid,
+    data_source_id: &Uuid,
+    name: &str,
+) -> Result<Dataset> {
     // Get the user organization id.
     let organization_id = get_user_organization_id(&user_id).await?;
 
@@ -87,6 +92,8 @@ async fn post_dataset_handler(user_id: &Uuid, data_source_id: &Uuid, name: &str)
         Err(e) => return Err(anyhow!("Data sources not found: {}", e)),
     };
 
+    let database_name = name.replace(" ", "_");
+
     let dataset = Dataset {
         id: Uuid::new_v4(),
         name: name.to_string(),
@@ -94,7 +101,7 @@ async fn post_dataset_handler(user_id: &Uuid, data_source_id: &Uuid, name: &str)
         organization_id: organization_id.clone(),
         created_at: chrono::Utc::now(),
         updated_at: chrono::Utc::now(),
-        database_name: String::new(),
+        database_name,
         when_to_use: None,
         when_not_to_use: None,
         type_: DatasetType::Table,
