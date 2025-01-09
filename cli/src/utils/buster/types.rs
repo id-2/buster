@@ -31,6 +31,7 @@ pub struct PostDatasetsRequest {
     pub sql_definition: Option<String>,
     pub entity_relationships: Option<Vec<PostDatasetsEntityRelationshipsRequest>>,
     pub columns: Vec<PostDatasetsColumnsRequest>,
+    pub yml_file: String,
 }
 
 #[derive(Debug, Serialize)]

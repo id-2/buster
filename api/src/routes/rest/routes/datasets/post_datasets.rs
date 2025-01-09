@@ -35,6 +35,7 @@ pub struct PostDatasetsRequest {
     pub sql_definition: Option<String>,
     pub entity_relationships: Option<Vec<PostDatasetsEntityRelationshipsRequest>>,
     pub columns: Vec<PostDatasetsColumnsRequest>,
+    pub yml_file: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -144,6 +145,7 @@ async fn post_datasets_handler(user_id: &Uuid, requests: Vec<PostDatasetsRequest
             deleted_at: None,
             imported: false,
             organization_id,
+            yml_file: None,
         };
 
         datasets.push(dataset);

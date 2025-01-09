@@ -155,6 +155,7 @@ async fn get_data_source_datasets(data_source_id: Uuid) -> Result<Vec<Dataset>> 
             datasets::created_at,
             datasets::updated_at,
             datasets::deleted_at,
+            datasets::yml_file,
         ))
         .filter(datasets::data_source_id.eq(&data_source_id))
         .filter(datasets::deleted_at.is_null())

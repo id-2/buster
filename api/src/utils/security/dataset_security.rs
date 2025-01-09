@@ -42,6 +42,7 @@ pub async fn get_permissioned_datasets(
             datasets::created_at,
             datasets::updated_at,
             datasets::deleted_at,
+            datasets::yml_file,
         ))
         .inner_join(
             datasets_to_permission_groups::table

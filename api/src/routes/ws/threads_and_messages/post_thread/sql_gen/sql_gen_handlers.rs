@@ -705,6 +705,7 @@ async fn get_user_specified_dataset(
             datasets::created_at,
             datasets::updated_at,
             datasets::deleted_at,
+            datasets::yml_file,
         ))
         .inner_join(
             datasets_to_permission_groups::table
@@ -774,6 +775,7 @@ async fn get_permissioned_datasets(pool: &PgPool, user_id: &Uuid) -> Result<Vec<
             datasets::created_at,
             datasets::updated_at,
             datasets::deleted_at,
+            datasets::yml_file,
         ))
         .inner_join(
             datasets_to_permission_groups::table.on(datasets::id

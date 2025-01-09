@@ -17,6 +17,7 @@ use super::{
 pub struct BusterModelObject {
     pub sql_definition: String,
     pub model_file: BusterModel,
+    pub yml_content: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -91,6 +92,7 @@ async fn process_directory(
                     model_objects.push(BusterModelObject {
                         sql_definition,
                         model_file: model,
+                        yml_content: yaml_content,
                     });
                 }
             }
@@ -160,6 +162,7 @@ pub async fn upload_model_files(
                 sql_definition: Some(model.sql_definition.clone()),
                 entity_relationships: Some(entity_relationships),
                 columns,
+                yml_file: model.yml_content.clone(),
             };
 
             post_datasets_req_body.push(dataset);

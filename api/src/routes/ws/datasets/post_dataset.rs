@@ -257,6 +257,7 @@ async fn create_dataset(user_id: &Uuid, name: &String, data_source_id: &Uuid) ->
         deleted_at: None,
         imported: false,
         organization_id: user_org_id,
+        yml_file: None,
     };
 
     let mut conn = match get_pg_pool().get().await {

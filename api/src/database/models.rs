@@ -159,6 +159,7 @@ pub struct Dataset {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
+    pub yml_file: Option<String>,
 }
 
 #[derive(Insertable, Queryable, Associations, Debug)]

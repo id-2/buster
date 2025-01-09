@@ -3,12 +3,6 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
 };
-use serde::{Deserialize, Serialize};
-
-use crate::{
-    error::BusterError,
-    utils::profiles::{Credential, Profile},
-};
 
 use super::{
     PostDataSourcesRequest, PostDatasetsRequest, ValidateApiKeyRequest, ValidateApiKeyResponse,

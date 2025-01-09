@@ -188,6 +188,7 @@ async fn get_dataset_and_columns(
                 datasets::created_at,
                 datasets::updated_at,
                 datasets::deleted_at.nullable(),
+                datasets::yml_file.nullable(),
             ),
             (
                 dataset_columns::id,
