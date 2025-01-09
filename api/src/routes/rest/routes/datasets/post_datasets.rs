@@ -145,6 +145,7 @@ async fn post_datasets_handler(user_id: &Uuid, requests: Vec<PostDatasetsRequest
             deleted_at: None,
             imported: false,
             organization_id,
+            model: req.model.clone(),
             yml_file: None,
         };
 

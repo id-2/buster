@@ -137,26 +137,7 @@ async fn get_data_source_datasets(data_source_id: Uuid) -> Result<Vec<Dataset>> 
     };
 
     let datasets = match datasets::table
-        .select((
-            datasets::id,
-            datasets::name,
-            datasets::database_name,
-            datasets::when_to_use,
-            datasets::when_not_to_use,
-            datasets::type_,
-            datasets::definition,
-            datasets::schema,
-            datasets::enabled,
-            datasets::imported,
-            datasets::data_source_id,
-            datasets::organization_id,
-            datasets::created_by,
-            datasets::updated_by,
-            datasets::created_at,
-            datasets::updated_at,
-            datasets::deleted_at,
-            datasets::yml_file,
-        ))
+        .select(datasets::all_columns)
         .filter(datasets::data_source_id.eq(&data_source_id))
         .filter(datasets::deleted_at.is_null())
         .load::<Dataset>(&mut conn)
