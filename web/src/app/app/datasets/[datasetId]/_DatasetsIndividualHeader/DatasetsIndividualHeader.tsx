@@ -53,8 +53,6 @@ export const DatasetsIndividualHeader: React.FC<{
     setOpenNewDatasetModal(true);
   });
 
-  if (showSkeletonLoader) return <></>;
-
   return (
     <>
       <AppContentHeader className="items-center justify-between space-x-2">

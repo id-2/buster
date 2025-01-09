@@ -49,8 +49,6 @@ export const DatasetHeader: React.FC<{
     setOpenNewDatasetModal(true);
   });
 
-  console.log(dataset);
-
   return (
     <>
       <AppContentHeader className="items-center justify-between space-x-2">

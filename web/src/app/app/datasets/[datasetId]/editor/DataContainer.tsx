@@ -6,8 +6,9 @@ import AppDataGrid from '@/components/table/AppDataGrid';
 
 export const DataContainer: React.FC<{
   data: BusterDatasetData;
+  fetchingData: boolean;
   className?: string;
-}> = React.memo(({ data, className }) => {
+}> = React.memo(({ data, fetchingData, className }) => {
   const { styles, cx } = useStyles();
   const hasData = !isEmpty(data);
 
@@ -16,7 +17,9 @@ export const DataContainer: React.FC<{
       {hasData ? (
         <AppDataGrid rows={data} />
       ) : (
-        <div className="flex justify-center py-24">No data returned</div>
+        <div className="flex h-full items-center justify-center">
+          {fetchingData ? 'Loading data...' : 'No data returned'}
+        </div>
       )}
     </div>
   );
