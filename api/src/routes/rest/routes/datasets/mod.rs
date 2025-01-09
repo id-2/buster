@@ -1,8 +1,9 @@
 mod assets;
+mod deploy_datasets;
 mod get_dataset;
 mod get_dataset_data_sample;
 mod list_datasets;
-mod deploy_datasets;
+mod post_dataset;
 
 use axum::{
     routing::{get, post},
@@ -12,6 +13,7 @@ use axum::{
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_datasets::list_datasets))
+        .route("/", post(post_dataset::post_dataset))
         .route("/deploy", post(deploy_datasets::deploy_datasets))
         .route("/:dataset_id", get(get_dataset::get_dataset))
         .route(
