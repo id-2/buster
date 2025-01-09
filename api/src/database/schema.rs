@@ -238,6 +238,7 @@ diesel::table! {
         updated_at -> Timestamptz,
         deleted_at -> Nullable<Timestamptz>,
         model -> Nullable<Text>,
+        yml_file -> Nullable<Text>,
     }
 }
 

@@ -21,7 +21,7 @@ pub struct PostDataSourcesRequest {
 }
 
 #[derive(Debug, Serialize)]
-pub struct PostDatasetsRequest {
+pub struct DeployDatasetsRequest {
     pub data_source_name: String,
     pub env: String,
     pub name: String,
@@ -29,12 +29,13 @@ pub struct PostDatasetsRequest {
     pub schema: String,
     pub description: String,
     pub sql_definition: Option<String>,
-    pub entity_relationships: Option<Vec<PostDatasetsEntityRelationshipsRequest>>,
-    pub columns: Vec<PostDatasetsColumnsRequest>,
+    pub entity_relationships: Option<Vec<DeployDatasetsEntityRelationshipsRequest>>,
+    pub columns: Vec<DeployDatasetsColumnsRequest>,
+    pub yml_file: String,
 }
 
 #[derive(Debug, Serialize)]
-pub struct PostDatasetsColumnsRequest {
+pub struct DeployDatasetsColumnsRequest {
     pub name: String,
     pub description: String,
     pub semantic_type: Option<String>,
@@ -45,7 +46,7 @@ pub struct PostDatasetsColumnsRequest {
 }
 
 #[derive(Debug, Serialize)]
-pub struct PostDatasetsEntityRelationshipsRequest {
+pub struct DeployDatasetsEntityRelationshipsRequest {
     pub name: String,
     pub expr: String,
     #[serde(rename = "type")]

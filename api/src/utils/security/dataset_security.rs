@@ -24,25 +24,7 @@ pub async fn get_permissioned_datasets(
     };
 
     let datasets = match datasets::table
-        .select((
-            datasets::id,
-            datasets::name,
-            datasets::database_name,
-            datasets::when_to_use,
-            datasets::when_not_to_use,
-            datasets::type_,
-            datasets::definition,
-            datasets::schema,
-            datasets::enabled,
-            datasets::imported,
-            datasets::data_source_id,
-            datasets::organization_id,
-            datasets::created_by,
-            datasets::updated_by,
-            datasets::created_at,
-            datasets::updated_at,
-            datasets::deleted_at,
-        ))
+        .select(datasets::all_columns)
         .inner_join(
             datasets_to_permission_groups::table
                 .on(datasets::id.eq(datasets_to_permission_groups::dataset_id)),

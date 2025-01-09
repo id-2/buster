@@ -1,6 +1,5 @@
 use anyhow::Result;
 use inquire::MultiSelect;
-use ratatui::style::Stylize;
 use tokio::task::JoinSet;
 
 use crate::utils::{
