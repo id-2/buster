@@ -5,7 +5,7 @@ use reqwest::{
 };
 
 use super::{
-    PostDataSourcesRequest, PostDatasetsRequest, ValidateApiKeyRequest, ValidateApiKeyResponse,
+    PostDataSourcesRequest, DeployDatasetsRequest, ValidateApiKeyRequest, ValidateApiKeyResponse,
 };
 
 pub struct BusterClient {
@@ -85,12 +85,12 @@ impl BusterClient {
         }
     }
 
-    pub async fn post_datasets(&self, req_body: Vec<PostDatasetsRequest>) -> Result<()> {
+    pub async fn deploy_datasets(&self, req_body: Vec<DeployDatasetsRequest>) -> Result<()> {
         let headers = self.build_headers()?;
 
         match self
             .client
-            .post(format!("{}/api/v1/datasets", self.base_url))
+            .post(format!("{}/api/v1/datasets/deploy", self.base_url))
             .headers(headers)
             .json(&req_body)
             .send()
@@ -99,13 +99,13 @@ impl BusterClient {
             Ok(res) => {
                 if !res.status().is_success() {
                     return Err(anyhow::anyhow!(
-                        "POST /api/v1/datasets failed: {}",
+                        "POST /api/v1/datasets/deploy failed: {}",
                         res.text().await?
                     ));
                 }
                 Ok(())
             }
-            Err(e) => Err(anyhow::anyhow!("POST /api/v1/datasets failed: {}", e)),
+            Err(e) => Err(anyhow::anyhow!("POST /api/v1/datasets/deploy failed: {}", e)),
         }
     }
 }

@@ -25,7 +25,7 @@ use crate::{
 };
 
 #[derive(Debug, Deserialize)]
-pub struct PostDatasetsRequest {
+pub struct DeployDatasetsRequest {
     pub data_source_name: String,
     pub env: String,
     pub name: String,
@@ -33,13 +33,13 @@ pub struct PostDatasetsRequest {
     pub schema: String,
     pub description: String,
     pub sql_definition: Option<String>,
-    pub entity_relationships: Option<Vec<PostDatasetsEntityRelationshipsRequest>>,
-    pub columns: Vec<PostDatasetsColumnsRequest>,
+    pub entity_relationships: Option<Vec<DeployDatasetsEntityRelationshipsRequest>>,
+    pub columns: Vec<DeployDatasetsColumnsRequest>,
     pub yml_file: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct PostDatasetsColumnsRequest {
+pub struct DeployDatasetsColumnsRequest {
     pub name: String,
     pub description: String,
     pub semantic_type: Option<String>,
@@ -50,7 +50,7 @@ pub struct PostDatasetsColumnsRequest {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct PostDatasetsEntityRelationshipsRequest {
+pub struct DeployDatasetsEntityRelationshipsRequest {
     pub name: String,
     pub expr: String,
     #[serde(rename = "type")]
@@ -58,15 +58,15 @@ pub struct PostDatasetsEntityRelationshipsRequest {
 }
 
 #[derive(Serialize)]
-pub struct PostDatasetsResponse {
+pub struct DeployDatasetsResponse {
     pub ids: Vec<Uuid>,
 }
 
-pub async fn post_datasets(
+pub async fn deploy_datasets(
     Extension(user): Extension<User>,
-    Json(request): Json<Vec<PostDatasetsRequest>>,
-) -> Result<ApiResponse<PostDatasetsResponse>, (axum::http::StatusCode, String)> {
-    let _ = match post_datasets_handler(&user.id, request).await {
+    Json(request): Json<Vec<DeployDatasetsRequest>>,
+) -> Result<ApiResponse<DeployDatasetsResponse>, (axum::http::StatusCode, String)> {
+    let _ = match deploy_datasets_handler(&user.id, request).await {
         Ok(dataset) => dataset,
         Err(e) => {
             tracing::error!("Error creating dataset: {:?}", e);
@@ -77,7 +77,7 @@ pub async fn post_datasets(
     Ok(ApiResponse::OK)
 }
 
-async fn post_datasets_handler(user_id: &Uuid, requests: Vec<PostDatasetsRequest>) -> Result<()> {
+async fn deploy_datasets_handler(user_id: &Uuid, requests: Vec<DeployDatasetsRequest>) -> Result<()> {
     // Get the user organization id.
     let organization_id = get_user_organization_id(&user_id).await?;
 

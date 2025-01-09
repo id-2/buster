@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use tokio::fs;
 
 use crate::utils::{
-    BusterClient, PostDatasetsColumnsRequest, PostDatasetsEntityRelationshipsRequest,
-    PostDatasetsRequest,
+    BusterClient, DeployDatasetsColumnsRequest, DeployDatasetsEntityRelationshipsRequest,
+    DeployDatasetsRequest,
 };
 
 use super::{
@@ -121,7 +121,7 @@ pub async fn upload_model_files(
             let mut columns = Vec::new();
 
             for column in semantic_model.dimensions {
-                columns.push(PostDatasetsColumnsRequest {
+                columns.push(DeployDatasetsColumnsRequest {
                     name: column.name,
                     description: column.description,
                     semantic_type: Some(String::from("dimension")),
@@ -132,7 +132,7 @@ pub async fn upload_model_files(
             }
 
             for column in semantic_model.measures {
-                columns.push(PostDatasetsColumnsRequest {
+                columns.push(DeployDatasetsColumnsRequest {
                     name: column.name,
                     description: column.description,
                     semantic_type: Some(String::from("measure")),
@@ -145,14 +145,14 @@ pub async fn upload_model_files(
             let mut entity_relationships = Vec::new();
 
             for entity in semantic_model.entities {
-                entity_relationships.push(PostDatasetsEntityRelationshipsRequest {
+                entity_relationships.push(DeployDatasetsEntityRelationshipsRequest {
                     name: entity.name,
                     expr: entity.expr,
                     type_: entity.entity_type,
                 });
             }
 
-            let dataset = PostDatasetsRequest {
+            let dataset = DeployDatasetsRequest {
                 data_source_name: profile_name.clone(),
                 env: profile.target.clone(),
                 name: semantic_model.name,
@@ -171,7 +171,7 @@ pub async fn upload_model_files(
 
     let buster = BusterClient::new(buster_creds.url, buster_creds.api_key)?;
 
-    if let Err(e) = buster.post_datasets(post_datasets_req_body).await {
+    if let Err(e) = buster.deploy_datasets(post_datasets_req_body).await {
         return Err(anyhow::anyhow!(
             "Failed to upload model files to Buster: {}",
             e
