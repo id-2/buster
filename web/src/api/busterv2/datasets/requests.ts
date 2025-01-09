@@ -23,7 +23,7 @@ export const getDatasetMetadata = async (datasetId: string): Promise<BusterDatas
 
 export const getDatasetData = async (datasetId: string): Promise<BusterDatasetData> => {
   return await mainApi
-    .get<BusterDatasetData>(`/datasets/${datasetId}/data`)
+    .get<BusterDatasetData>(`/datasets/${datasetId}/data/sample`)
     .then((res) => res.data);
 };
 

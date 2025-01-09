@@ -111,7 +111,7 @@ export const useIndividualDatasetHook = ({}: {}) => {
 };
 
 export const useIndividualDataset = ({ datasetId }: { datasetId: string }) => {
-  const { data: dataset } = useGetDatasetMetadata(datasetId);
-  const { data: datasetData } = useGetDatasetData(datasetId);
-  return { dataset, datasetData };
+  const { data: dataset, isFetched: isFetchedDataset } = useGetDatasetMetadata(datasetId);
+  const { data: datasetData, isFetched: isFetchedDatasetData } = useGetDatasetData(datasetId);
+  return { dataset, datasetData, isFetchedDataset, isFetchedDatasetData };
 };

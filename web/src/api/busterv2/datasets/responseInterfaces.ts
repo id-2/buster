@@ -23,26 +23,11 @@ export interface BusterDatasetListItem {
 }
 
 export type BusterDataset = {
-  created_at: string;
-  created_by: string;
-  data_source_id: string;
-  database_name: string;
-  definition: string; //aka SQL
-  deleted_at: null;
-  enabled: boolean;
+  description: string;
   id: string;
   name: string;
-  schema: string;
-  type: 'view';
-  updated_at: string;
-  updated_by: string;
-  when_not_to_use: string;
-  when_to_use: string;
-  columns: BusterDatasetColumn[];
-  created_by_name: string;
-  data_source: DataSource;
-  data: Record<string, string | number | null>[];
-  imported: boolean;
+  sql: string;
+  yml_file: string;
 };
 
 export interface BusterDatasetColumn {
@@ -58,6 +43,4 @@ export interface BusterDatasetColumn {
   updated_at: string;
 }
 
-export interface BusterDatasetData {
-  data: Record<string, string | number | null>[];
-}
+export type BusterDatasetData = Record<string, string | number | null>[];

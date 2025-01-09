@@ -13,14 +13,14 @@ import {
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
   const [sql, setSQL] = useState<string>('');
-  const { dataset } = useIndividualDataset({ datasetId });
+  const datasetResult = useIndividualDataset({ datasetId });
   const selectedApp = segments;
 
   useLayoutEffect(() => {
-    setSQL(dataset?.definition || '');
-  }, [dataset?.definition]);
+    setSQL(datasetResult.dataset?.sql || '');
+  }, [datasetResult.dataset?.sql]);
 
-  return { sql, selectedApp, dataset, setSQL };
+  return { sql, selectedApp, setSQL, ...datasetResult };
 };
 
 const DatasetPageContext = createContext<ReturnType<typeof useDatasetPageContext>>(

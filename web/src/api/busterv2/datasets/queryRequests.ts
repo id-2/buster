@@ -18,7 +18,8 @@ export const useGetDatasetData = (datasetId: string) => {
   return useCreateReactQuery<BusterDatasetData>({
     queryKey: ['datasetData', datasetId],
     queryFn,
-    enabled: !!datasetId
+    enabled: !!datasetId,
+    refetchOnMount: false
   });
 };
 

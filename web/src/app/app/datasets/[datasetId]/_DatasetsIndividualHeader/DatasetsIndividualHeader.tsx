@@ -28,14 +28,14 @@ export const DatasetsIndividualHeader: React.FC<{
   const isSQLApp = selectedApp === DatasetApps.EDITOR;
 
   const disablePublish = useMemo(() => {
-    const originalSQL = selectedDataset?.definition || '';
+    const originalSQL = selectedDataset?.sql || '';
     return !selectedDataset?.id || !sql || originalSQL === sql;
-  }, [selectedDataset?.definition, sql]);
+  }, [selectedDataset?.sql, sql]);
 
   const preventNavigation = !disablePublish;
 
   const onReset = useMemoizedFn(() => {
-    setSQL(selectedDataset?.definition || '');
+    setSQL(selectedDataset?.sql || '');
   });
 
   const onClosePublishModal = useMemoizedFn(() => {
@@ -86,7 +86,7 @@ export const DatasetsIndividualHeader: React.FC<{
             <Divider type="vertical" className="!h-4" />
 
             <div className="flex items-center space-x-2">
-              <Button type="text" onClick={onReset} disabled={sql === selectedDataset?.definition}>
+              <Button type="text" onClick={onReset} disabled={sql === selectedDataset?.sql}>
                 Reset
               </Button>
               <AppTooltip title={'Open publish dataset'} shortcuts={['p']}>

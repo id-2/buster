@@ -1,8 +1,7 @@
-import { BusterDataset } from '@/api/busterv2/datasets';
-import { AppMaterialIcons } from '@/components';
+import { BusterDataset, BusterDatasetData } from '@/api/busterv2/datasets';
+import { AppMaterialIcons, CircleSpinnerLoaderContainer, ShimmerText } from '@/components';
 import AppDataGrid from '@/components/table/AppDataGrid';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { createBusterRoute, BusterRoutes } from '@/routes';
 import { useAntToken } from '@/styles/useAntToken';
 import { Button } from 'antd';
 import Link from 'next/link';
@@ -13,10 +12,10 @@ import isEmpty from 'lodash/isEmpty';
 import { createStyles } from 'antd-style';
 
 export const OverviewData: React.FC<{
-  definition: BusterDataset['definition'];
   datasetId: string;
-  data: BusterDataset['data'];
-}> = React.memo(({ definition, datasetId, data }) => {
+  data: BusterDatasetData;
+  isFetchedDatasetData: boolean;
+}> = React.memo(({ datasetId, data, isFetchedDatasetData }) => {
   const token = useAntToken();
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
 
@@ -28,11 +27,13 @@ export const OverviewData: React.FC<{
     <div
       className="buster-chart h-full w-full overflow-auto"
       style={{
-        maxHeight: '500px',
+        maxHeight: '70vh',
         border: `0.5px solid ${token.colorBorder}`,
         borderRadius: `${token.borderRadius}px`
       }}>
-      {!isEmpty(data) ? (
+      {!isFetchedDatasetData ? (
+        <LoadingState />
+      ) : !isEmpty(data) ? (
         <AppDataGrid
           rows={data || []}
           headerFormat={isAdmin ? (v) => v : undefined}
@@ -52,6 +53,14 @@ const EmptyState = () => {
   return (
     <div className={cx(styles.emptyState, 'flex justify-center py-24')}>
       <Text type="tertiary">No data available</Text>
+    </div>
+  );
+};
+
+const LoadingState: React.FC<{}> = () => {
+  return (
+    <div className="flex justify-center py-24">
+      <ShimmerText text="Loading data..." />
     </div>
   );
 };
