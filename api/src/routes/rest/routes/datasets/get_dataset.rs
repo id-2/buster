@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Result};
 use axum::{extract::Path, Extension};
-use chrono::{DateTime, Utc};
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl};
 use diesel_async::RunQueryDsl;
 use serde::Serialize;
@@ -8,9 +7,9 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        enums::{DatasetType, UserOrganizationRole},
+        enums::UserOrganizationRole,
         lib::get_pg_pool,
-        models::{DataSource, Dataset, User},
+        models::User,
         schema::{data_sources, datasets, users, users_to_organizations},
     },
     routes::rest::ApiResponse,
@@ -32,20 +31,10 @@ pub struct GetDatasetDataSource {
 #[derive(Serialize)]
 pub struct GetDatasetResponse {
     pub id: Uuid,
-    pub name: String,
-    pub database_name: String,
+    #[serde(rename = "description")]
     pub when_to_use: Option<String>,
-    pub when_not_to_use: Option<String>,
-    #[serde(rename = "type")]
-    pub type_: DatasetType,
-    pub definition: String,
-    pub schema: String,
-    pub enabled: bool,
-    pub imported: bool,
-    pub data_source: GetDatasetDataSource,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub owner: GetDatasetOwner,
+    pub name: String,
+    pub sql: Option<String>,
     pub yml_file: Option<String>,
 }
 
@@ -73,7 +62,10 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
 
     // First check if user has admin access through their organization role
     let user_role = match users_to_organizations::table
-        .inner_join(datasets::table.on(users_to_organizations::organization_id.eq(datasets::organization_id)))
+        .inner_join(
+            datasets::table
+                .on(users_to_organizations::organization_id.eq(datasets::organization_id)),
+        )
         .select(users_to_organizations::role)
         .filter(datasets::id.eq(dataset_id))
         .filter(users_to_organizations::user_id.eq(user.id))
@@ -85,23 +77,28 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
         Err(e) => return Err(anyhow!("Unable to get user role: {}", e)),
     };
 
-    let has_admin_access = matches!(user_role, UserOrganizationRole::WorkspaceAdmin | UserOrganizationRole::DataAdmin);
+    let has_admin_access = matches!(
+        user_role,
+        UserOrganizationRole::WorkspaceAdmin | UserOrganizationRole::DataAdmin
+    );
 
     if !has_admin_access {
-        return Err(anyhow!("User does not have permission to access this dataset"));
+        return Err(anyhow!(
+            "User does not have permission to access this dataset"
+        ));
     }
 
-    let (dataset, data_source, owner) = match datasets::table
-        .inner_join(data_sources::table.on(datasets::data_source_id.eq(data_sources::id)))
-        .inner_join(users::table.on(datasets::created_by.eq(users::id)))
+    let (dataset_id, name, sql, when_to_use, yml_file) = match datasets::table
         .filter(datasets::id.eq(dataset_id))
         .filter(datasets::deleted_at.is_null())
         .select((
-            datasets::all_columns,
-            data_sources::all_columns,
-            users::all_columns,
+            datasets::id,
+            datasets::name,
+            datasets::definition,
+            datasets::when_to_use,
+            datasets::yml_file,
         ))
-        .first::<(Dataset, DataSource, User)>(&mut conn)
+        .first::<(Uuid, String, String, Option<String>, Option<String>)>(&mut conn)
         .await
     {
         Ok(result) => result,
@@ -109,27 +106,10 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
     };
 
     Ok(GetDatasetResponse {
-        id: dataset.id,
-        name: dataset.name,
-        database_name: dataset.database_name,
-        when_to_use: dataset.when_to_use,
-        when_not_to_use: dataset.when_not_to_use,
-        type_: dataset.type_,
-        definition: dataset.definition,
-        schema: dataset.schema,
-        enabled: dataset.enabled,
-        imported: dataset.imported,
-        data_source: GetDatasetDataSource {
-            id: data_source.id,
-            name: data_source.name,
-        },
-        created_at: dataset.created_at,
-        updated_at: dataset.updated_at,
-        owner: GetDatasetOwner {
-            id: owner.id,
-            name: owner.name.unwrap_or(owner.email),
-            avatar_url: None,
-        },
-        yml_file: dataset.yml_file,
+        id: dataset_id,
+        name,
+        sql: Some(sql),
+        when_to_use,
+        yml_file,
     })
 }
