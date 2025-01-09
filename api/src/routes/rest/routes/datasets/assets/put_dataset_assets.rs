@@ -23,6 +23,8 @@ pub struct AssetAssignment {
     pub assigned: bool,
 }
 
+// TODO: When we introduce the dataset groups, this list should update the datasets_to_dataset_groups table, not related to permissions.
+
 pub async fn put_permissions(
     Extension(user): Extension<User>,
     Path((dataset_id, permission_type)): Path<(Uuid, String)>,
@@ -78,7 +80,7 @@ pub async fn put_permissions_handler(
                     .set(dataset_permissions::deleted_at.eq(Utc::now()))
                     .execute(&mut *conn)
                     .await?;
-                
+
                 tracing::debug!("Unassigned {} rows", rows_affected);
             }
             Ok::<_, anyhow::Error>(())
