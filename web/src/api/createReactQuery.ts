@@ -9,6 +9,10 @@ import {
   keepPreviousData,
   useInfiniteQuery
 } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { RustApiError } from './buster/errors';
+import { useMemoizedFn } from 'ahooks';
 
 export interface BaseCreateQueryProps {
   refetchOnWindowFocus?: boolean;
@@ -20,6 +24,7 @@ export interface BaseCreateQueryProps {
 interface CreateQueryProps<T> extends UseQueryOptions<T> {
   queryKey: (string | number | object)[];
   isUseSession?: boolean;
+  useErrorNotification?: boolean;
 }
 
 export const useCreateReactQuery = <T>({
@@ -30,8 +35,10 @@ export const useCreateReactQuery = <T>({
   initialData,
   refetchOnWindowFocus = false,
   refetchOnMount = true,
+  useErrorNotification = true,
   ...rest
 }: CreateQueryProps<T> & BaseCreateQueryProps) => {
+  const { openErrorNotification } = useBusterNotifications();
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const baseEnabled = isUseSession ? !!accessToken : true;
 
@@ -44,16 +51,16 @@ export const useCreateReactQuery = <T>({
     refetchOnWindowFocus,
     refetchOnMount,
     ...rest
-    // onError: (error) => {
-    //   openErrorNotification(error);
-    // },
   });
 
-  // useEffect(() => {
-  //   if (q.error) {
-  //     // openErrorNotification(q.error);
-  //   }
-  // }, [q?.error]);
+  useEffect(() => {
+    if (q.error && useErrorNotification) {
+      const errorMessage = q.error as RustApiError;
+      openErrorNotification({
+        message: errorMessage.message
+      });
+    }
+  }, [q.error, useErrorNotification]);
 
   return q as QueryReturnType<T>;
 };
@@ -61,9 +68,9 @@ export const useCreateReactQuery = <T>({
 export const useResetReactQuery = () => {
   const queryClient = useQueryClient();
 
-  const run = () => {
+  const run = useMemoizedFn(() => {
     queryClient.clear();
-  };
+  });
 
   return { run };
 };

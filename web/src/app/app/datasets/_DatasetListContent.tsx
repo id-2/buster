@@ -60,7 +60,7 @@ export const DatasetListContent: React.FC<{
   datasetsList: BusterDatasetListItem[];
   isFetchedDatasets: boolean;
   isAdmin: boolean;
-}> = ({ datasetsList, isFetchedDatasets, isAdmin }) => {
+}> = React.memo(({ datasetsList, isFetchedDatasets, isAdmin }) => {
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -112,7 +112,9 @@ export const DatasetListContent: React.FC<{
       </AppContent>
     </>
   );
-};
+});
+
+DatasetListContent.displayName = 'DatasetListContent';
 
 const getStatusText = (d: BusterDatasetListItem) => {
   if (d.enabled) {

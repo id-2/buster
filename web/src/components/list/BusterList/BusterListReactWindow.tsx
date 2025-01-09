@@ -33,7 +33,6 @@ export const BusterList: React.FC<BusterListProps> = ({
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const showEmptyState = (!rows || rows.length === 0) && !!emptyState;
-  const scrollY = useRef(0);
 
   const [contextMenuPosition, setContextMenuPosition] = useState<{
     x: number;

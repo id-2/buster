@@ -13,6 +13,11 @@ import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { formatDate } from '@/utils/date';
 import { timeout } from '@/utils';
 
+const headerConfig = {
+  title: 'Create a dataset',
+  description: 'Select a datasource to create or import your dataset from.'
+};
+
 export const NewDatasetModal: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -37,9 +42,10 @@ export const NewDatasetModal: React.FC<{
     if (creatingDataset || disableSubmit) return;
     setCreatingDataset(true);
     beforeCreate?.();
-    const res = (await createDataset({
+
+    const res = await createDataset({
       data_source_id: selectedDatasource!
-    })) as BusterDataset;
+    });
     if (res.id) {
       onChangePage({
         route: BusterRoutes.APP_DATASETS_ID_OVERVIEW,
@@ -69,26 +75,23 @@ export const NewDatasetModal: React.FC<{
     }
   }, [open]);
 
+  const footerConfig = useMemo(() => {
+    return {
+      secondaryButton: {
+        text: 'Add a datasource',
+        onClick: onAddDataSourceClick
+      },
+      primaryButton: {
+        text: 'Create dataset',
+        onClick: createNewDatasetPreflight,
+        loading: creatingDataset,
+        disabled: disableSubmit
+      }
+    };
+  }, [creatingDataset, disableSubmit]);
+
   return (
-    <AppModal
-      open={open}
-      onClose={onClose}
-      header={{
-        title: 'Create a dataset',
-        description: 'Select a datasource to create or import your dataset from.'
-      }}
-      footer={{
-        secondaryButton: {
-          text: 'Add a datasource',
-          onClick: onAddDataSourceClick
-        },
-        primaryButton: {
-          text: 'Create dataset',
-          onClick: createNewDatasetPreflight,
-          loading: creatingDataset,
-          disabled: disableSubmit
-        }
-      }}>
+    <AppModal open={open} onClose={onClose} header={headerConfig} footer={footerConfig}>
       {open && (
         <SelectDataSourceDropdown
           setSelectedDatasource={setSelectedDatasource}

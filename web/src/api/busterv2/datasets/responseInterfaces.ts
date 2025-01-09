@@ -57,3 +57,7 @@ export interface BusterDatasetColumn {
   nullable: boolean;
   updated_at: string;
 }
+
+export interface BusterDatasetData {
+  data: Record<string, string | number | null>[];
+}

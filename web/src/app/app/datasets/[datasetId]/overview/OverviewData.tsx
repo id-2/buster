@@ -10,6 +10,7 @@ import React from 'react';
 import { Text, Title } from '@/components/text';
 import { useMemoizedFn } from 'ahooks';
 import isEmpty from 'lodash/isEmpty';
+import { createStyles } from 'antd-style';
 
 export const OverviewData: React.FC<{
   definition: BusterDataset['definition'];
@@ -65,12 +66,25 @@ export const OverviewData: React.FC<{
           cellFormat={defaultCellFormatter}
         />
       ) : (
-        <div className="flex justify-center py-24">
-          <Text type="secondary">No data available</Text>
-        </div>
+        <EmptyState />
       )}
     </div>
   );
 });
 
 OverviewData.displayName = 'OverviewData';
+
+const EmptyState = () => {
+  const { styles, cx } = useStyles();
+  return (
+    <div className={cx(styles.emptyState, 'flex justify-center py-24')}>
+      <Text type="tertiary">No data available</Text>
+    </div>
+  );
+};
+
+const useStyles = createStyles(({ token }) => ({
+  emptyState: {
+    background: token.colorBgBase
+  }
+}));
