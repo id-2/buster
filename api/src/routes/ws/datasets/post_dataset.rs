@@ -106,30 +106,6 @@ async fn post_dataset_handler(
         }
     };
 
-    let name = format!("dataset_index_{}", dataset_id.clone());
-    let new_collection_schema = json!({
-        "name": name,
-        "fields": [
-            {"name": "id", "type": "string"},
-            {"name": "value", "type": "string"},
-            {"name": "dataset_id", "type": "string"},
-            {"name": "dataset_column_id", "type": "string"},
-            {"name": "value_embedding", "type": "float[]", "embed": {
-                "from": [
-                    "value"
-                ],
-                "model_config": {
-                    "model_name": "ts/jina-embeddings-v2-base-en"
-                }
-            }},
-        ],
-    });
-
-    match typesense::create_collection(new_collection_schema).await {
-        Ok(_) => (),
-        Err(e) => return Err(anyhow!("Error creating dataset index: {}", e)),
-    };
-
     let dataset_state = match get_dataset_state(&dataset_id, &user_id).await {
         Ok(dataset_state) => dataset_state,
         Err(e) => return Err(anyhow!("Error getting dataset state: {}", e)),
