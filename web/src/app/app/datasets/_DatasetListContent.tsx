@@ -2,16 +2,15 @@
 
 import React, { useState, useMemo } from 'react';
 import { AppContent } from '../_components/AppContent';
-import { useUserConfigContextSelector } from '@/context/Users';
 import { BusterUserAvatar } from '@/components';
 import { formatDate } from '@/utils';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterDatasetListItem, useGetDatasets } from '@/api/busterv2/datasets';
+import { BusterDatasetListItem } from '@/api/busterv2/datasets';
 import { ListEmptyState } from '../_components/Lists/ListEmptyState';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useMemoizedFn } from 'ahooks';
-import { DatasetSelectedOptionPopup } from './[datasetId]/_DatasetSelectedPopup';
+import { DatasetSelectedOptionPopup } from './_DatasetSelectedPopup';
 
 const columns: BusterListColumn[] = [
   {

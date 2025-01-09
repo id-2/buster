@@ -7,22 +7,21 @@ import React, { useMemo } from 'react';
 export const DatasetBreadcrumb: React.FC<{
   datasetName?: string;
 }> = React.memo(({ datasetName }) => {
-  const breadcrumbItems = useMemo(
-    () =>
-      [
-        {
-          title: (
-            <Link prefetch href={createBusterRoute({ route: BusterRoutes.APP_DATASETS })}>
-              Datasets
-            </Link>
-          )
-        },
-        {
-          title: datasetName
-        }
-      ].filter((item) => item.title),
-    [datasetName]
-  );
+  const breadcrumbItems = useMemo(() => {
+    if (datasetName) {
+      return [{ title: datasetName }];
+    }
+
+    return [
+      {
+        title: (
+          <Link prefetch href={createBusterRoute({ route: BusterRoutes.APP_DATASETS })}>
+            Datasets
+          </Link>
+        )
+      }
+    ];
+  }, [datasetName]);
 
   return (
     <>
@@ -34,3 +33,5 @@ export const DatasetBreadcrumb: React.FC<{
     </>
   );
 });
+
+DatasetBreadcrumb.displayName = 'DatasetBreadcrumb';

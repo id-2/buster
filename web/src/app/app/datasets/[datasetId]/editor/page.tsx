@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DatasetSQL } from '../_DatasetSQL';
+import { DatasetSQL } from './_DatasetSQL';
 import { useDatasetPageContextSelector } from '../_DatasetPageContext';
 
 export default function Page() {

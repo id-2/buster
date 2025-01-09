@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DatasetDescriptions } from '../_DatasetDescriptions';
+import { DatasetDescriptions } from './_DatasetDescriptions';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useDatasetPageContextSelector } from '../_DatasetPageContext';
 
