@@ -1,5 +1,6 @@
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { mainApi } from '../../buster';
+import * as config from './config';
 
 export const getDatasets = async (params?: {
   page?: number;
@@ -18,7 +19,9 @@ export const getDatasets = async (params?: {
 };
 
 export const getDatasetMetadata = async (datasetId: string): Promise<BusterDataset> => {
-  return await mainApi.get<BusterDataset>(`/datasets/${datasetId}`).then((res) => res.data);
+  return await mainApi
+    .get<BusterDataset>(config.GET_DATASET_URL(datasetId))
+    .then((res) => res.data);
 };
 
 export const getDatasetData = async (datasetId: string): Promise<BusterDatasetData> => {

@@ -43,7 +43,7 @@ export const useCreateReactQuery = <T>({
   const baseEnabled = isUseSession ? !!accessToken : true;
 
   const q = useQuery({
-    queryKey: [...queryKey],
+    queryKey: queryKey,
     queryFn,
     enabled: baseEnabled && !!enabled,
     initialData,
@@ -62,7 +62,7 @@ export const useCreateReactQuery = <T>({
     }
   }, [q.error, useErrorNotification]);
 
-  return q as QueryReturnType<T>;
+  return q;
 };
 
 export const useResetReactQuery = () => {
@@ -95,11 +95,6 @@ interface PaginatedQueryProps<T> extends CreateQueryProps<T> {
   initialData?: T;
 }
 
-// Add a type helper to handle the return type
-type QueryReturnType<T> = Omit<ReturnType<typeof useQuery>, 'data'> & {
-  data: T;
-};
-
 export const useCreateReactQueryPaginated = <T>({
   queryKey,
   queryFn,
@@ -111,7 +106,7 @@ export const useCreateReactQueryPaginated = <T>({
   page = 0,
   pageSize = 25,
   ...rest
-}: PaginatedQueryProps<T> & BaseCreateQueryProps): QueryReturnType<T> => {
+}: PaginatedQueryProps<T> & BaseCreateQueryProps) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const baseEnabled = isUseSession ? !!accessToken : true;
 
@@ -125,11 +120,11 @@ export const useCreateReactQueryPaginated = <T>({
     refetchOnMount,
     placeholderData: keepPreviousData,
     ...rest
-  }) as QueryReturnType<T>;
+  });
 };
 
 type InfiniteQueryReturnType<T> = Omit<ReturnType<typeof useInfiniteQuery>, 'data'> & {
-  data: T;
+  data: T | undefined;
 };
 
 export const useCreateReactInfiniteQuery = <T>({

@@ -1,41 +1,20 @@
-'use client';
-
-import { DatasetPageProvider, useDatasetPageContextSelector } from './_DatasetPageContext';
-import { DatasetsIndividualHeader } from './_DatasetsIndividualHeader';
-import { AppContent } from '@/app/app/_components/AppContent';
 import React from 'react';
+import { DatasetPageLayout } from './DatasetPageLayout';
+import { prefetchGetDatasetMetadata } from '@/api/busterv2/datasets';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-export default function Layout({
+export default async function Layout({
   params,
   children
 }: {
   params: { datasetId: string };
   children: React.ReactNode;
 }) {
+  const queryClient = await prefetchGetDatasetMetadata(params.datasetId);
+
   return (
-    <DatasetPageProvider datasetId={params.datasetId}>
-      <LayoutContent>{children}</LayoutContent>
-    </DatasetPageProvider>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <DatasetPageLayout datasetId={params.datasetId}>{children}</DatasetPageLayout>
+    </HydrationBoundary>
   );
 }
-
-const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const sql = useDatasetPageContextSelector((state) => state.sql);
-  const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
-  const dataset = useDatasetPageContextSelector((state) => state.dataset);
-  const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
-
-  return (
-    <>
-      <DatasetsIndividualHeader
-        selectedApp={selectedApp}
-        sql={sql}
-        datasetId={dataset?.data?.id}
-        datasetSQL={dataset?.data?.sql}
-        datasetName={dataset?.data?.name}
-        setSQL={setSQL}
-      />
-      <AppContent>{children}</AppContent>
-    </>
-  );
-};

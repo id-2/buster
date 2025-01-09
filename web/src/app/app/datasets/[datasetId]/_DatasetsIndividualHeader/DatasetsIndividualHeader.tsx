@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { Button, Divider } from 'antd';
-import { AppTooltip, PreventNavigation } from '@/components';
+import { PreventNavigation } from '@/components';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppContentHeader } from '../../../_components/AppContentHeader';
@@ -23,9 +23,6 @@ export const DatasetsIndividualHeader: React.FC<{
 }> = React.memo(({ sql, setSQL, selectedApp, datasetId, datasetSQL, datasetName }) => {
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
-  const showSkeletonLoader = !datasetId;
-
-  const isSQLApp = selectedApp === DatasetApps.EDITOR;
 
   const disablePublish = useMemo(() => {
     const originalSQL = datasetSQL || '';
