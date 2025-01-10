@@ -7,16 +7,12 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use crate::database::enums::IdentityType;
-use crate::database::schema::sql_types::IdentityTypeEnum;
 use crate::database::schema::{datasets, permission_groups, permission_groups_to_identities};
 use crate::database::{
     enums::{UserOrganizationRole, UserOrganizationStatus},
     lib::get_pg_pool,
     models::User,
-    schema::{
-        dataset_permissions, datasets_to_permission_groups, permission_groups_to_users, users,
-        users_to_organizations,
-    },
+    schema::{dataset_permissions, users, users_to_organizations},
 };
 use crate::routes::rest::ApiResponse;
 use crate::utils::security::checks::is_user_workspace_admin_or_data_admin;
@@ -33,6 +29,7 @@ pub struct UserPermissionLineage {
 pub struct UserOverviewItem {
     pub id: Uuid,
     pub name: String,
+    pub email: String,
     pub can_query: bool,
     pub lineage: Vec<Vec<UserPermissionLineage>>,
 }
@@ -70,15 +67,20 @@ pub async fn get_dataset_overview(
         .inner_join(users::table.on(users_to_organizations::user_id.eq(users::id)))
         .filter(users_to_organizations::status.eq(UserOrganizationStatus::Active))
         .filter(users_to_organizations::deleted_at.is_null())
-        .select((users::id, users::email, users_to_organizations::role))
-        .load::<(Uuid, String, UserOrganizationRole)>(&mut conn)
+        .select((
+            users::id,
+            users::email,
+            users_to_organizations::role,
+            users::name.nullable(),
+        ))
+        .load::<(Uuid, String, UserOrganizationRole, Option<String>)>(&mut conn)
         .await
         .map_err(|e| {
             tracing::error!("Error getting users: {:?}", e);
             (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
         })?;
 
-    let user_ids = users.iter().map(|(id, _, _)| *id).collect::<Vec<_>>();
+    let user_ids = users.iter().map(|(id, _, _, _)| *id).collect::<Vec<_>>();
 
     let datasets_query: Vec<(Uuid, String, Uuid)> = dataset_permissions::table
         .inner_join(datasets::table.on(dataset_permissions::dataset_id.eq(datasets::id)))
@@ -132,7 +134,7 @@ pub async fn get_dataset_overview(
 
     let users = users
         .into_iter()
-        .map(|(id, email, role)| {
+        .map(|(id, email, role, name)| {
             let can_query = match role {
                 UserOrganizationRole::WorkspaceAdmin => true,
                 UserOrganizationRole::DataAdmin => true,
@@ -183,7 +185,6 @@ pub async fn get_dataset_overview(
                         name: Some(String::from("Viewer")),
                     });
                 }
-                _ => (),
             }
 
             lineage.push(org_lineage);
@@ -227,9 +228,10 @@ pub async fn get_dataset_overview(
 
             return UserOverviewItem {
                 id,
-                name: email,
+                name: name.unwrap_or(email.clone()),
                 can_query,
                 lineage,
+                email,
             };
         })
         .collect();
