@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, Title } from '@/components/text';
+import { Text } from '@/components/text';
 import { BusterListRow } from './interfaces';
 import { useMemoizedFn } from 'ahooks';
 import { CheckboxColumn } from './CheckboxColumn';
@@ -46,10 +46,21 @@ export const BusterListSectionComponent = React.memo(
     });
 
     return (
-      <div className={cx(styles.sectionRow, 'group flex items-center')} style={style} ref={ref}>
+      <div
+        className={cx(
+          styles.sectionRow,
+          'group flex items-center',
+          !!onSelectSectionChange && 'hoverable'
+        )}
+        style={style}
+        ref={ref}>
         {onSelectSectionChange && <CheckboxColumn checkStatus={checkStatus} onChange={onChange} />}
 
-        <div className="flex items-center space-x-2 pl-[4px] leading-none">
+        <div
+          className={cx(
+            'flex items-center space-x-2 pl-[4px] leading-none',
+            !onSelectSectionChange && 'ml-3.5'
+          )}>
           <Text size="sm">{rowSection.title}</Text>
           <Text size="sm" type="tertiary">
             {rowSection.secondaryTitle}
@@ -66,9 +77,11 @@ export const useStyles = createStyles(({ css, token }) => ({
     height: ${HEIGHT_OF_SECTION_ROW}px;
     min-height: ${HEIGHT_OF_SECTION_ROW}px;
     background-color: ${token.controlItemBgActive};
-    //  border-bottom: 0.5px solid ${token.colorBorder};
-    &:hover {
-      background-color: ${token.controlItemBgActiveHover};
+
+    .hoverable {
+      &:hover {
+        background-color: ${token.controlItemBgActiveHover};
+      }
     }
   `
 }));

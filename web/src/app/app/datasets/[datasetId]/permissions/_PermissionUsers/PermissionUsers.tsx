@@ -7,10 +7,12 @@ import { Button } from 'antd';
 import { AppMaterialIcons } from '@/components/icons';
 import { useMemoizedFn } from 'ahooks';
 import { PermissionListUsersContainer } from './PermissionListUsersContainer';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
 export const PermissionUsers: React.FC<{
   datasetId: string;
 }> = React.memo(({ datasetId }) => {
+  const onToggleInviteModal = useAppLayoutContextSelector((x) => x.onToggleInviteModal);
   const { data: permissionUsers, isFetched: isPermissionUsersFetched } =
     useListPermissionUsers(datasetId);
 
@@ -22,7 +24,7 @@ export const PermissionUsers: React.FC<{
   });
 
   const openInviteUserModal = useMemoizedFn(() => {
-    //
+    onToggleInviteModal(true);
   });
 
   return (

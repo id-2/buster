@@ -33,3 +33,9 @@ export interface DatasetPermissionsOverviewResponse {
   dataset_id: string;
   users: DatasetPermissionOverviewUser[];
 }
+
+export interface ListDatasetGroupsResponse {
+  id: string;
+  name: string;
+  assigned: boolean;
+}

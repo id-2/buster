@@ -30,8 +30,8 @@ export const getDatasetDataSample = async (datasetId: string): Promise<BusterDat
     .then((res) => res.data);
 };
 
-export const createDataset = async (dataset: BusterDataset): Promise<BusterDataset> => {
-  return await mainApi.post<BusterDataset>(`/datasets`, dataset).then((res) => res.data);
+export const createDataset = async (): Promise<BusterDataset> => {
+  return await mainApi.post<BusterDataset>(`/datasets`).then((res) => res.data);
 };
 
 export const deleteDataset = async (datasetId: string): Promise<void> => {

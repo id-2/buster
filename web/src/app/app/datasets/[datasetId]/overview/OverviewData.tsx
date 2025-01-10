@@ -1,12 +1,10 @@
-import { BusterDataset, BusterDatasetData } from '@/api/busterv2/datasets';
-import { AppMaterialIcons, CircleSpinnerLoaderContainer, ShimmerText } from '@/components';
+import { BusterDatasetData } from '@/api/busterv2/datasets';
+import { ShimmerText } from '@/components';
 import AppDataGrid from '@/components/table/AppDataGrid';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useAntToken } from '@/styles/useAntToken';
-import { Button } from 'antd';
-import Link from 'next/link';
 import React from 'react';
-import { Text, Title } from '@/components/text';
+import { Text } from '@/components/text';
 import { useMemoizedFn } from 'ahooks';
 import isEmpty from 'lodash/isEmpty';
 import { createStyles } from 'antd-style';
@@ -15,7 +13,7 @@ export const OverviewData: React.FC<{
   datasetId: string;
   data: BusterDatasetData;
   isFetchedDatasetData: boolean;
-}> = React.memo(({ datasetId, data, isFetchedDatasetData }) => {
+}> = React.memo(({ data, isFetchedDatasetData }) => {
   const token = useAntToken();
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
 

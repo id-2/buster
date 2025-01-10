@@ -5,6 +5,7 @@ import { useMemoizedFn } from 'ahooks';
 import { Select } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useMemo, useState } from 'react';
+import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
 
 export const PermissionListDatasetGroupContainer: React.FC<{
   filteredPermissionGroups: ListDatasetGroupsResponse[];
@@ -106,17 +107,25 @@ export const PermissionListDatasetGroupContainer: React.FC<{
   );
 
   return (
-    <div className={cx('', styles.container)}>
-      <BusterInfiniteList
-        columns={columns}
-        rows={rows}
-        showHeader={false}
-        showSelectAll={false}
+    <>
+      <div className={cx('', styles.container)}>
+        <BusterInfiniteList
+          columns={columns}
+          rows={rows}
+          showHeader={false}
+          showSelectAll={false}
+          selectedRowKeys={selectedRowKeys}
+          onSelectChange={setSelectedRowKeys}
+          emptyState={<div className="py-12">No teams found</div>}
+        />
+      </div>
+
+      <PermissionDatasetGroupSelectedPopup
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={<div className="py-12">No teams found</div>}
+        datasetId={datasetId}
       />
-    </div>
+    </>
   );
 };
 
@@ -134,11 +143,11 @@ const DatasetGroupInfoCell: React.FC<{ name: string }> = ({ name }) => {
 
 const options = [
   {
-    label: 'Assigned',
+    label: 'Included',
     value: true
   },
   {
-    label: 'Not Assigned',
+    label: 'Not Included',
     value: false
   }
 ];
@@ -152,7 +161,7 @@ const DatasetGroupAssignedCell: React.FC<{
     return (
       <Select
         options={options}
-        defaultValue={assigned}
+        defaultValue={assigned || false}
         popupMatchSelectWidth
         onSelect={(value) => {
           onSelect({ id, assigned: value });

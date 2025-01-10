@@ -5,6 +5,7 @@ import { useMemoizedFn } from 'ahooks';
 import { Select } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useMemo, useState } from 'react';
+import { Text } from '@/components/text';
 
 export const PermissionListPermissionGroupContainer: React.FC<{
   filteredPermissionGroups: ListPermissionGroupsResponse[];
@@ -115,7 +116,11 @@ export const PermissionListPermissionGroupContainer: React.FC<{
         showSelectAll={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={<div className="py-12">No teams found</div>}
+        emptyState={
+          <div className="py-12">
+            <Text type="tertiary">No teams found</Text>
+          </div>
+        }
       />
     </div>
   );
