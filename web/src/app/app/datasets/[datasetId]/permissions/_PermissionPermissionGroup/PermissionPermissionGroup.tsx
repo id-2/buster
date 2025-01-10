@@ -1,49 +1,24 @@
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useState } from 'react';
 import { HeaderExplanation } from '../HeaderExplanation';
 import { PermissionSearch } from '../PermissionSearch';
-import { useDebounceFn, useMemoizedFn } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { Button } from 'antd';
 import { AppMaterialIcons } from '@/components';
 import { PermissionListPermissionGroupContainer } from './PermissionListPermissionGroupContainer';
-import { ListPermissionGroupsResponse, useListPermissionGroups } from '@/api/busterv2/datasets';
+import { useListPermissionGroups } from '@/api/busterv2/datasets';
 import { NewPermissionGroupModal } from './NewPermissionGroupModal';
+import { useDebounceSearch } from '../useDebounceSearch';
 
 export const PermissionPermissionGroup: React.FC<{
   datasetId: string;
 }> = React.memo(({ datasetId }) => {
-  const [isPending, startTransition] = useTransition();
   const { data: permissionGroups, isFetched: isPermissionGroupsFetched } =
     useListPermissionGroups(datasetId);
   const [isNewPermissionGroupModalOpen, setIsNewPermissionGroupModalOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [filteredPermissionGroups, setFilteredPermissionGroups] = useState<
-    ListPermissionGroupsResponse[]
-  >([]);
 
-  const filterPermissionGroups = useMemoizedFn((text: string): ListPermissionGroupsResponse[] => {
-    if (!text) return permissionGroups || [];
-    const lowerCaseSearchText = text.toLowerCase();
-    return (permissionGroups || []).filter((p) => {
-      return p.name.toLowerCase().includes(lowerCaseSearchText);
-    });
-  });
-
-  const updateFilteredPermissionGroups = useMemoizedFn((text: string) => {
-    startTransition(() => {
-      setFilteredPermissionGroups(filterPermissionGroups(text));
-    });
-  });
-
-  const { run: debouncedSearch } = useDebounceFn(
-    (text: string) => {
-      updateFilteredPermissionGroups(text);
-    },
-    { wait: 300 }
-  );
-
-  const handleSearchChange = useMemoizedFn((text: string) => {
-    setSearchText(text);
-    debouncedSearch(text);
+  const { filteredItems, searchText, handleSearchChange, isPending } = useDebounceSearch({
+    items: permissionGroups || [],
+    searchPredicate: (item, searchText) => item.name.toLowerCase().includes(searchText)
   });
 
   const onCloseNewPermissionGroupModal = useMemoizedFn(() => {
@@ -53,10 +28,6 @@ export const PermissionPermissionGroup: React.FC<{
   const onOpenNewPermissionGroupModal = useMemoizedFn(() => {
     setIsNewPermissionGroupModalOpen(true);
   });
-
-  useEffect(() => {
-    setFilteredPermissionGroups(permissionGroups || []);
-  }, [permissionGroups]);
 
   return (
     <>
@@ -82,7 +53,7 @@ export const PermissionPermissionGroup: React.FC<{
         </div>
         {isPermissionGroupsFetched && (
           <PermissionListPermissionGroupContainer
-            filteredPermissionGroups={filteredPermissionGroups}
+            filteredPermissionGroups={filteredItems}
             datasetId={datasetId}
           />
         )}

@@ -1,26 +1,26 @@
-import { useCreatePermissionGroup } from '@/api/busterv2/permission_groups/queryRequests';
 import { AppModal } from '@/components';
 import { useMemoizedFn } from 'ahooks';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Input, InputRef } from 'antd';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useCreateDatasetGroup } from '@/api/busterv2/dataset_groups';
 
-interface NewPermissionGroupModalProps {
+interface NewDatasetGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   datasetId: string;
 }
 
-export const NewPermissionGroupModal: React.FC<NewPermissionGroupModalProps> = React.memo(
+export const NewDatasetGroupModal: React.FC<NewDatasetGroupModalProps> = React.memo(
   ({ isOpen, onClose, datasetId }) => {
-    const { mutateAsync, isPending } = useCreatePermissionGroup(datasetId);
+    const { mutateAsync, isPending } = useCreateDatasetGroup(datasetId);
     const inputRef = useRef<InputRef>(null);
     const { openInfoMessage } = useBusterNotifications();
 
-    const onCreateNewPermissionGroup = useMemoizedFn(async () => {
+    const onCreateNewDatasetGroup = useMemoizedFn(async () => {
       const inputValue = inputRef.current?.input?.value;
       if (!inputValue) {
-        openInfoMessage('Please enter a name for the permission group');
+        openInfoMessage('Please enter a name for the dataset group');
         inputRef.current?.focus();
         return;
       }
@@ -32,8 +32,8 @@ export const NewPermissionGroupModal: React.FC<NewPermissionGroupModalProps> = R
 
     const header = useMemo(() => {
       return {
-        title: 'New permission group',
-        description: 'Create a new permission group'
+        title: 'New dataset group',
+        description: 'Create a new dataset group'
       };
     }, []);
 
@@ -44,8 +44,8 @@ export const NewPermissionGroupModal: React.FC<NewPermissionGroupModalProps> = R
           onClick: onClose
         },
         primaryButton: {
-          text: 'Create permission group',
-          onClick: onCreateNewPermissionGroup,
+          text: 'Create dataset group',
+          onClick: onCreateNewDatasetGroup,
           loading: isPending
         }
       };
@@ -61,10 +61,10 @@ export const NewPermissionGroupModal: React.FC<NewPermissionGroupModalProps> = R
 
     return (
       <AppModal open={isOpen} onClose={onClose} header={header} footer={footer}>
-        <Input ref={inputRef} placeholder="Name of permission group" />
+        <Input ref={inputRef} placeholder="Name of dataset group" />
       </AppModal>
     );
   }
 );
 
-NewPermissionGroupModal.displayName = 'NewPermissionGroupModal';
+NewDatasetGroupModal.displayName = 'NewDatasetGroupModal';

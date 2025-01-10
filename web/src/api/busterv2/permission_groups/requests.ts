@@ -20,13 +20,13 @@ export const updatePermissionGroup = async ({
   id: string;
   data: { id: string; name: string }[];
 }): Promise<void> => {
-  return await mainApi.put(`/permission_groups/${id}`, data);
+  return await mainApi.put(`/permission_groups/${id}`, data).then((res) => res.data);
 };
 
 export const deletePermissionGroup = async ({ id }: { id: string }): Promise<void> => {
-  return await mainApi.delete(`/permission_groups/${id}`);
+  return await mainApi.delete(`/permission_groups/${id}`).then((res) => res.data);
 };
 
 export const createPermissionGroup = async (data: { name: string }): Promise<void> => {
-  return await mainApi.post(`/permission_groups`, data);
+  return await mainApi.post(`/permission_groups`, data).then((res) => res.data);
 };

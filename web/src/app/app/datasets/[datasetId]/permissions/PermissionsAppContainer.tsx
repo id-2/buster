@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { PermissionAppSegments } from './PermissionAppSegments';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PermissionApps } from './config';
-import { PermissionDatasetGroups } from './PermissionDatasetGroups';
+import { PermissionDatasetGroups } from './_PermissionDatasetGroups/PermissionDatasetGroups';
 import { PermissionOverview } from './_PermissionOverview';
 import { PermissionPermissionGroup } from './_PermissionPermissionGroup/PermissionPermissionGroup';
 import { PermissionUsers } from './PermissionUsers';

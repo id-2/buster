@@ -1,4 +1,4 @@
-import { ListPermissionGroupsResponse, useUpdatePermissionGroups } from '@/api/busterv2/datasets';
+import { ListDatasetGroupsResponse, useUpdateDatasetGroups } from '@/api/busterv2';
 import { BusterListColumn, BusterListRowItem } from '@/components/list';
 import { BusterInfiniteList } from '@/components/list/BusterInfiniteList';
 import { useMemoizedFn } from 'ahooks';
@@ -6,18 +6,17 @@ import { Select } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useMemo, useState } from 'react';
 
-export const PermissionListPermissionGroupContainer: React.FC<{
-  filteredPermissionGroups: ListPermissionGroupsResponse[];
+export const PermissionListDatasetGroupContainer: React.FC<{
+  filteredPermissionGroups: ListDatasetGroupsResponse[];
   datasetId: string;
-}> = React.memo(({ filteredPermissionGroups, datasetId }) => {
+}> = ({ filteredPermissionGroups, datasetId }) => {
   const { styles, cx } = useStyles();
-  const { mutateAsync: updatePermissionGroups } = useUpdatePermissionGroups(datasetId);
+  const { mutateAsync: updateDatasetGroups } = useUpdateDatasetGroups(datasetId);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
-
   const numberOfPermissionGroups = filteredPermissionGroups.length;
 
   const onSelectAssigned = useMemoizedFn(async (params: { id: string; assigned: boolean }) => {
-    updatePermissionGroups([params]);
+    await updateDatasetGroups([params]);
   });
 
   const columns: BusterListColumn[] = useMemo(
@@ -27,17 +26,17 @@ export const PermissionListPermissionGroupContainer: React.FC<{
         dataIndex: 'name',
         width: 270,
         render: (name: string) => {
-          return <PermissionGroupInfoCell name={name} />;
+          return <DatasetGroupInfoCell name={name} />;
         }
       },
       {
         title: 'Assigned',
         dataIndex: 'assigned',
-        render: (assigned: boolean, permissionGroup: ListPermissionGroupsResponse) => {
+        render: (assigned: boolean, datasetGroup: ListDatasetGroupsResponse) => {
           return (
             <div className="flex justify-end">
-              <PermissionGroupAssignedCell
-                id={permissionGroup.id}
+              <DatasetGroupAssignedCell
+                id={datasetGroup.id}
                 assigned={assigned}
                 onSelect={onSelectAssigned}
               />
@@ -119,9 +118,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
       />
     </div>
   );
-});
-
-PermissionListPermissionGroupContainer.displayName = 'PermissionListTeamContainer';
+};
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
@@ -131,10 +128,9 @@ const useStyles = createStyles(({ css, token }) => ({
   `
 }));
 
-const PermissionGroupInfoCell = React.memo(({ name }: { name: string }) => {
+const DatasetGroupInfoCell: React.FC<{ name: string }> = ({ name }) => {
   return <div>{name}</div>;
-});
-PermissionGroupInfoCell.displayName = 'PermissionGroupInfoCell';
+};
 
 const options = [
   {
@@ -147,16 +143,12 @@ const options = [
   }
 ];
 
-const PermissionGroupAssignedCell = React.memo(
-  ({
-    id,
-    assigned,
-    onSelect
-  }: {
-    id: string;
-    assigned: boolean;
-    onSelect: (value: { id: string; assigned: boolean }) => void;
-  }) => {
+const DatasetGroupAssignedCell: React.FC<{
+  id: string;
+  assigned: boolean;
+  onSelect: (params: { id: string; assigned: boolean }) => Promise<void>;
+}> = React.memo(
+  ({ id, assigned, onSelect }) => {
     return (
       <Select
         options={options}
@@ -171,4 +163,4 @@ const PermissionGroupAssignedCell = React.memo(
   () => true
 );
 
-PermissionGroupAssignedCell.displayName = 'PermissionGroupAssignedCell';
+DatasetGroupAssignedCell.displayName = 'DatasetGroupAssignedCell';
