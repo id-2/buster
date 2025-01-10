@@ -1,5 +1,11 @@
 import { useCreateReactMutation, useCreateReactQuery } from '@/api/createReactQuery';
-import { createDataset, getDatasetData, getDatasetMetadata, getDatasets } from './requests';
+import {
+  createDataset,
+  deployDataset,
+  getDatasetDataSample,
+  getDatasetMetadata,
+  getDatasets
+} from './requests';
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { useMemoizedFn } from 'ahooks';
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -36,22 +42,14 @@ export const prefetchGetDatasets = async (
 };
 
 export const useGetDatasetData = (datasetId: string) => {
-  const queryFn = useMemoizedFn(() => getDatasetData(datasetId));
+  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId));
   return useCreateReactQuery<BusterDatasetData>({
     queryKey: ['datasetData', datasetId],
     queryFn,
     enabled: !!datasetId,
-    refetchOnMount: false
+    refetchOnMount: false,
+    staleTime: 1000 * 60 * 10 // 10 minutes
   });
-};
-
-export const prefetchGetDatasetData = async (datasetId: string, queryClientProp?: QueryClient) => {
-  const queryClient = queryClientProp || new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ['datasetData', datasetId],
-    queryFn: () => getDatasetData(datasetId)
-  });
-  return queryClient;
 };
 
 export const useGetDatasetMetadata = (datasetId: string) => {
@@ -98,5 +96,18 @@ export const useCreateDataset = () => {
     mutationFn,
     onSuccess,
     onError
+  });
+};
+
+export const useDeployDataset = () => {
+  const mutationFn = useMemoizedFn((params: { dataset_id: string; sql: string; yml: string }) =>
+    deployDataset(params)
+  );
+  const onSuccess = useMemoizedFn((res: any) => {
+    console.log(res);
+  });
+  return useCreateReactMutation({
+    mutationFn,
+    onSuccess
   });
 };

@@ -16,9 +16,13 @@ export const DatasetsHeaderOptions: React.FC<{
   datasetId: string | undefined;
 }> = React.memo(({ datasetId, isAdmin, selectedApp }) => {
   const { push } = useRouter();
-  const optionsItems = isAdmin
-    ? [DatasetApps.OVERVIEW, DatasetApps.PERMISSIONS, DatasetApps.EDITOR]
-    : [DatasetApps.OVERVIEW, DatasetApps.PERMISSIONS];
+  const optionsItems = useMemo(
+    () =>
+      isAdmin
+        ? [DatasetApps.OVERVIEW, DatasetApps.PERMISSIONS, DatasetApps.EDITOR]
+        : [DatasetApps.OVERVIEW, DatasetApps.PERMISSIONS],
+    [isAdmin]
+  );
 
   const options: SegmentedProps['options'] = useMemo(
     () =>

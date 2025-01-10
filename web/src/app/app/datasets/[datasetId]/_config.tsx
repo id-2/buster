@@ -3,7 +3,7 @@ import React from 'react';
 
 export enum DatasetApps {
   OVERVIEW = 'overview',
-  PERMISSIONS = 'PERMISSIONS',
+  PERMISSIONS = 'permissions',
   EDITOR = 'editor'
 }
 

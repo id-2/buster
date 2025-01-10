@@ -19,7 +19,6 @@ export const EditorContent: React.FC<{
   const ref = useRef<HTMLDivElement>(null);
   const splitterRef = useRef<AppSplitterRef>(null);
   const [selectedApp, setSelectedApp] = useState<EditorApps>(EditorApps.PREVIEW);
-  const dataset = useDatasetPageContextSelector((state) => state.dataset);
   const datasetData = useDatasetPageContextSelector((state) => state.datasetData);
   const sql = useDatasetPageContextSelector((state) => state.sql);
   const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
@@ -28,6 +27,7 @@ export const EditorContent: React.FC<{
 
   const [tempData, setTempData] = useState<BusterDatasetData>(datasetData.data || []);
   const [fetchingTempData, setFetchingTempData] = useState(false);
+
   const { runAsync: runQuery } = useRequest(
     async () => {
       await timeout(1000);

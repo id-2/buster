@@ -24,7 +24,7 @@ export const getDatasetMetadata = async (datasetId: string): Promise<BusterDatas
     .then((res) => res.data);
 };
 
-export const getDatasetData = async (datasetId: string): Promise<BusterDatasetData> => {
+export const getDatasetDataSample = async (datasetId: string): Promise<BusterDatasetData> => {
   return await mainApi
     .get<BusterDatasetData>(`/datasets/${datasetId}/data/sample`)
     .then((res) => res.data);
@@ -36,4 +36,17 @@ export const createDataset = async (dataset: BusterDataset): Promise<BusterDatas
 
 export const deleteDataset = async (datasetId: string): Promise<void> => {
   return await mainApi.delete(`/datasets/${datasetId}`).then((res) => res.data);
+};
+
+export const deployDataset = async ({
+  dataset_id,
+  ...params
+}: {
+  dataset_id: string;
+  sql: string;
+  yml: string;
+}): Promise<void> => {
+  return await mainApi
+    .post(`/datasets/deploy`, { id: dataset_id, ...params })
+    .then((res) => res.data);
 };

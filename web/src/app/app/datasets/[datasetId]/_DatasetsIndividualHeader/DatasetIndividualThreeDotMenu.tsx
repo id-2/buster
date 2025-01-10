@@ -22,7 +22,7 @@ export const DatasetIndividualThreeDotMenu: React.FC<{
   }, [datasetId, onDeleteDataset]);
 
   return (
-    <Dropdown menu={menu}>
+    <Dropdown menu={menu} trigger={['click']}>
       <Button type="text" icon={<AppMaterialIcons icon="more_horiz" />} />
     </Dropdown>
   );

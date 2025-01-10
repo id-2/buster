@@ -1,26 +1,17 @@
-'use client';
-
 import React from 'react';
-import { DatasetDescriptions } from './_DatasetDescriptions';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { useDatasetPageContextSelector } from '../_DatasetPageContext';
+import { PermissionTitleCard } from './PermissionTitleCard';
+import { prefetchGetDatasetPermissionsOverview } from '@/api/busterv2/datasets/permissions/queryRequests';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
-export default function Page() {
-  const sql = useDatasetPageContextSelector((state) => state.sql);
-  const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
-  const dataset = useDatasetPageContextSelector((state) => state.dataset);
-  const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
-  const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
+export default async function Page({ params }: { params: { datasetId: string } }) {
+  const datasetId = params.datasetId;
+  const queryClient = await prefetchGetDatasetPermissionsOverview(datasetId);
 
   return (
-    <div className="m-auto max-w-[1400px] overflow-y-auto px-14 pb-12 pt-12">
-      <DatasetDescriptions
-        setSQL={setSQL}
-        sql={sql}
-        isAdmin={isAdmin}
-        selectedApp={selectedApp}
-        selectedDataset={dataset}
-      />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="m-auto max-w-[1400px] overflow-y-auto px-14 pb-12 pt-12">
+        <PermissionTitleCard datasetId={datasetId} />
+      </div>
+    </HydrationBoundary>
   );
 }

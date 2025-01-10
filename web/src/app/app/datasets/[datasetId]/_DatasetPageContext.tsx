@@ -2,7 +2,7 @@
 
 import { useIndividualDataset } from '@/context/Datasets';
 import { useSelectedLayoutSegment } from 'next/navigation';
-import React, { PropsWithChildren, useLayoutEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useLayoutEffect, useState } from 'react';
 import { DatasetApps } from './_config';
 import {
   createContext,
@@ -12,23 +12,24 @@ import {
 
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
-  const datasetResult = useIndividualDataset({ datasetId });
-  const datasetSQL = datasetResult.dataset.data?.sql;
-  const datasetYmlFile = datasetResult.dataset.data?.yml_file;
-  const [sql, setSQL] = useState<string>(datasetSQL || '');
+  const { dataset, datasetData } = useIndividualDataset({ datasetId });
+  const originalDatasetSQL = dataset.data?.sql;
+  const datasetYmlFile = dataset.data?.yml_file;
+
+  const [sql, setSQL] = useState<string>(originalDatasetSQL || '');
   const [ymlFile, setYmlFile] = useState<string>(datasetYmlFile || '');
 
   const selectedApp = segments;
 
-  useLayoutEffect(() => {
-    setSQL(datasetSQL || '');
-  }, [datasetSQL]);
+  useEffect(() => {
+    setSQL(originalDatasetSQL || '');
+  }, [originalDatasetSQL]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setYmlFile(datasetYmlFile || '');
   }, [datasetYmlFile]);
 
-  return { sql, ymlFile, selectedApp, setSQL, setYmlFile, ...datasetResult };
+  return { sql, ymlFile, selectedApp, setSQL, setYmlFile, datasetData, dataset };
 };
 
 const DatasetPageContext = createContext<ReturnType<typeof useDatasetPageContext>>(
