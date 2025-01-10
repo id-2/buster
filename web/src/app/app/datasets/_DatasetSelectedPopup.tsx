@@ -4,6 +4,7 @@ import { Button } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useDeleteDataset } from '@/api/busterv2';
 
 export const DatasetSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];
@@ -30,7 +31,7 @@ const DeleteButton: React.FC<{
   selectedRowKeys: string[];
   onSelectChange: (selectedRowKeys: string[]) => void;
 }> = ({ selectedRowKeys, onSelectChange }) => {
-  const onDeleteDataset = useDatasetContextSelector((state) => state.onDeleteDataset);
+  const { mutateAsync: onDeleteDataset } = useDeleteDataset();
   const { openConfirmModal } = useBusterNotifications();
 
   const onDeleteClick = useMemoizedFn(async () => {
@@ -39,7 +40,7 @@ const DeleteButton: React.FC<{
       content: 'Are you sure you want to delete this dataset?',
       onOk: async () => {
         const promises = selectedRowKeys.map((v) => {
-          return onDeleteDataset(v, true);
+          return onDeleteDataset(v);
         });
         await Promise.all(promises);
         onSelectChange([]);

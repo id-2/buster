@@ -5,7 +5,8 @@ import {
   getDatasetDataSample,
   getDatasetMetadata,
   getDatasets,
-  updateDataset
+  updateDataset,
+  deleteDataset
 } from './requests';
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { useMemoizedFn } from 'ahooks';
@@ -77,7 +78,7 @@ export const prefetchGetDatasetMetadata = async (
 
 export const useCreateDataset = () => {
   const queryClient = useQueryClient();
-  const mutationFn = useMemoizedFn((dataset: BusterDataset) => createDataset(dataset));
+  const mutationFn = useMemoizedFn(() => createDataset());
   const onSuccess = useMemoizedFn((newDataset: unknown) => {
     queryClient.setQueryData<BusterDatasetListItem[]>(['datasets', {}], (oldData) => {
       //   const newListItem: BusterDatasetListItem = {
@@ -120,5 +121,16 @@ export const useDeployDataset = () => {
 export const useUpdateDataset = () => {
   return useCreateReactMutation({
     mutationFn: updateDataset
+  });
+};
+
+export const useDeleteDataset = () => {
+  const queryClient = useQueryClient();
+  const onSuccess = useMemoizedFn(() => {
+    queryClient.invalidateQueries({ queryKey: ['datasets', {}] });
+  });
+  return useCreateReactMutation({
+    mutationFn: deleteDataset,
+    onSuccess
   });
 };

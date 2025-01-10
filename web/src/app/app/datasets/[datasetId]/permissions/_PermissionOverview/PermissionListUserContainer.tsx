@@ -104,9 +104,11 @@ export const PermissionListUserContainer: React.FC<{
           rows={rows}
           showHeader={false}
           showSelectAll={false}
-          selectedRowKeys={selectedRowKeys}
-          onSelectChange={setSelectedRowKeys}
-          emptyState={<div className="py-12">No users found</div>}
+          emptyState={
+            <div className="py-12">
+              <Text type="tertiary">No users found</Text>
+            </div>
+          }
         />
       </div>
     </>

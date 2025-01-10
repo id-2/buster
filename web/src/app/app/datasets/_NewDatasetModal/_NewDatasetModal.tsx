@@ -3,7 +3,12 @@ import { Button, Select, SelectProps } from 'antd';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useDataSourceContextSelector } from '@/context/DataSources';
-import { BusterDataset, BusterDatasetListItem, useGetDatasets } from '@/api/busterv2/datasets';
+import {
+  BusterDatasetListItem,
+  useCreateDataset,
+  useGetDatasets,
+  useUpdateDataset
+} from '@/api/busterv2/datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useRouter } from 'next/navigation';
@@ -26,11 +31,11 @@ export const NewDatasetModal: React.FC<{
   datasourceId?: string;
 }> = React.memo(({ open, onClose, beforeCreate, afterCreate, datasourceId }) => {
   const router = useRouter();
-  const createDataset = useDatasetContextSelector((state) => state.createDataset);
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
   const forceInitDataSourceList = useDataSourceContextSelector(
     (state) => state.forceInitDataSourceList
   );
+  const { mutateAsync: createDataset } = useCreateDataset();
   const [creatingDataset, setCreatingDataset] = React.useState(false);
   const [selectedDatasource, setSelectedDatasource] = React.useState<string | null>(
     datasourceId || null
@@ -160,7 +165,8 @@ const SelectFromExistingDataset: React.FC<{
   const { data: importedDatasets, isFetched: isFetchedDatasets } = useGetDatasets({
     imported: true
   });
-  const onUpdateDataset = useDatasetContextSelector((state) => state.onUpdateDataset);
+  const { mutateAsync: onUpdateDataset } = useUpdateDataset();
+
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
 
   const [submittingId, setSubmittingId] = useState<string | null>(null);
@@ -204,19 +210,19 @@ const SelectFromExistingDataset: React.FC<{
 
   const onSelectDataset = useMemoizedFn(async (datasetId: string) => {
     setSubmittingId(datasetId);
-    try {
-      await onUpdateDataset({
-        id: datasetId,
-        enabled: true
-      });
-      await timeout(500);
-      onChangePage({
-        route: BusterRoutes.APP_DATASETS_ID,
-        datasetId
-      });
-    } catch (error) {
-      setSubmittingId(null);
-    }
+    // try {
+    //   await onUpdateDataset({
+    //     id: datasetId,
+    //     name: 'test'
+    //   });
+    //   await timeout(500);
+    //   onChangePage({
+    //     route: BusterRoutes.APP_DATASETS_ID,
+    //     datasetId
+    //   });
+    // } catch (error) {
+    //   setSubmittingId(null);
+    // }
   });
 
   return (

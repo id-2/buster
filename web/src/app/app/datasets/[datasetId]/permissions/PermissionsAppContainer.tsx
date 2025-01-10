@@ -16,20 +16,17 @@ const selectedAppComponent: Record<PermissionApps, React.FC<{ datasetId: string 
   [PermissionApps.USERS]: PermissionUsers
 };
 
+const memoizedAnimation = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.125 }
+};
 export const PermissionsAppContainer: React.FC<{ datasetId: string }> = React.memo(
   ({ datasetId }) => {
     const [selectedApp, setSelectedApp] = useState<PermissionApps>(PermissionApps.OVERVIEW);
 
     const Component = selectedAppComponent[selectedApp];
-
-    const memoizedAnimation = useMemo(() => {
-      return {
-        initial: { opacity: 0 },
-        animate: { opacity: 1 },
-        exit: { opacity: 0 },
-        transition: { duration: 0.125 }
-      };
-    }, []);
 
     return (
       <>
