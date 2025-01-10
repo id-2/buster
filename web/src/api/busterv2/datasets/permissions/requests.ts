@@ -50,7 +50,12 @@ export const updatePermissionGroups = async ({
 }: {
   dataset_id: string;
   groups: { id: string; assigned: boolean }[];
-}): Promise<void> => {
+}): Promise<
+  {
+    id: string;
+    assigned: boolean;
+  }[]
+> => {
   return await mainApi.put(`/datasets/${dataset_id}/permission_groups`, groups);
 };
 

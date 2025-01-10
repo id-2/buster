@@ -3,13 +3,10 @@ import {
   useGetDatasetPermissionsOverview
 } from '@/api/busterv2/datasets';
 import React, { useMemo, useState, useTransition, useEffect } from 'react';
-import { Title, Text } from '@/components/text';
-import { Input } from 'antd';
 import { useMemoizedFn } from 'ahooks';
-import { AppMaterialIcons } from '@/components';
 import { useDebounceFn } from 'ahooks';
-import { HeaderExplanation } from './HeaderExplanation';
-import { PermissionOverviewSearch } from './PermissionOverviewSearch';
+import { HeaderExplanation } from '../HeaderExplanation';
+import { PermissionSearch } from '../PermissionSearch';
 import { PermissionListUserContainer } from './PermissionListUserContainer';
 
 export const PermissionOverview: React.FC<{
@@ -65,7 +62,7 @@ export const PermissionOverview: React.FC<{
     <>
       <HeaderExplanation className="mb-5" />
       <div className="flex h-full flex-col space-y-3">
-        <PermissionOverviewSearch searchText={searchText} setSearchText={handleSearchChange} />
+        <PermissionSearch searchText={searchText} setSearchText={handleSearchChange} />
         <PermissionListUserContainer filteredUsers={filteredUsers} />
         {/* You can use filteredUsers here to display the results */}
       </div>

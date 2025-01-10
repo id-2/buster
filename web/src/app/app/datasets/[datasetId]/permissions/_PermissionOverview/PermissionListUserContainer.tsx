@@ -15,26 +15,29 @@ export const PermissionListUserContainer: React.FC<{
 
   const numberOfUsers = filteredUsers.length;
 
-  const columns: BusterListColumn[] = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      width: 290,
-      render: (_: string, user: DatasetPermissionOverviewUser) => {
-        return <UserInfoCell user={user} />;
+  const columns: BusterListColumn[] = useMemo(
+    () => [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        width: 290,
+        render: (_: string, user: DatasetPermissionOverviewUser) => {
+          return <UserInfoCell user={user} />;
+        }
+      },
+      {
+        title: 'Lineage',
+        dataIndex: 'lineage',
+        render: (
+          lineage: DatasetPermissionOverviewUser['lineage'],
+          user: DatasetPermissionOverviewUser
+        ) => {
+          return <UserLineageCell user={user} />;
+        }
       }
-    },
-    {
-      title: 'Lineage',
-      dataIndex: 'lineage',
-      render: (
-        lineage: DatasetPermissionOverviewUser['lineage'],
-        user: DatasetPermissionOverviewUser
-      ) => {
-        return <UserLineageCell user={user} />;
-      }
-    }
-  ];
+    ],
+    []
+  );
 
   const { cannotQueryUsers, canQueryUsers } = useMemo(() => {
     const result: {
@@ -66,28 +69,32 @@ export const PermissionListUserContainer: React.FC<{
     return result;
   }, [filteredUsers]);
 
-  const rows = [
-    {
-      id: 'header-assigned',
-      data: {},
-      hidden: canQueryUsers.length === 0,
-      rowSection: {
-        title: 'Assigned',
-        secondaryTitle: numberOfUsers.toString()
-      }
-    },
-    ...canQueryUsers,
-    {
-      id: 'header-not-assigned',
-      data: {},
-      hidden: cannotQueryUsers.length === 0,
-      rowSection: {
-        title: 'Not Assigned',
-        secondaryTitle: cannotQueryUsers.length.toString()
-      }
-    },
-    ...cannotQueryUsers
-  ].filter((row) => !(row as any).hidden);
+  const rows = useMemo(
+    () =>
+      [
+        {
+          id: 'header-assigned',
+          data: {},
+          hidden: canQueryUsers.length === 0,
+          rowSection: {
+            title: 'Assigned',
+            secondaryTitle: numberOfUsers.toString()
+          }
+        },
+        ...canQueryUsers,
+        {
+          id: 'header-not-assigned',
+          data: {},
+          hidden: cannotQueryUsers.length === 0,
+          rowSection: {
+            title: 'Not Assigned',
+            secondaryTitle: cannotQueryUsers.length.toString()
+          }
+        },
+        ...cannotQueryUsers
+      ].filter((row) => !(row as any).hidden),
+    [canQueryUsers, cannotQueryUsers, numberOfUsers]
+  );
 
   return (
     <>

@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { PermissionApps } from './config';
 import { PermissionDatasetGroups } from './PermissionDatasetGroups';
 import { PermissionOverview } from './_PermissionOverview';
-import { PermissionPermissionGroup } from './PermissionPermissionGroup';
+import { PermissionPermissionGroup } from './_PermissionPermissionGroup/PermissionPermissionGroup';
 import { PermissionUsers } from './PermissionUsers';
 
 const selectedAppComponent: Record<PermissionApps, React.FC<{ datasetId: string }>> = {
@@ -26,7 +26,8 @@ export const PermissionsAppContainer: React.FC<{ datasetId: string }> = React.me
       return {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
-        exit: { opacity: 0 }
+        exit: { opacity: 0 },
+        transition: { duration: 0.125 }
       };
     }, []);
 

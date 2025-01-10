@@ -3,20 +3,21 @@ import { Input } from 'antd';
 import { AppMaterialIcons } from '@/components';
 import { useMemoizedFn } from 'ahooks';
 
-export const PermissionOverviewSearch: React.FC<{
+export const PermissionSearch: React.FC<{
   className?: string;
   searchText: string;
   setSearchText: (text: string) => void;
-}> = ({ className = '', searchText, setSearchText }) => {
+  placeholder?: string;
+}> = ({ className = '', searchText, setSearchText, placeholder = 'Search by name or email' }) => {
   const onChange = useMemoizedFn((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
   });
 
   return (
-    <div className={`flex flex-col space-y-1.5 ${className}`}>
+    <div className={`flex w-full flex-col space-y-1.5 ${className}`}>
       <Input
-        className="max-w-[280px]"
-        placeholder="Search by name or email"
+        className="w-[280px] max-w-[280px]"
+        placeholder={placeholder}
         value={searchText}
         onChange={onChange}
         allowClear
@@ -25,4 +26,4 @@ export const PermissionOverviewSearch: React.FC<{
     </div>
   );
 };
-PermissionOverviewSearch.displayName = 'PermissionOverviewSearch';
+PermissionSearch.displayName = 'PermissionOverviewSearch';
