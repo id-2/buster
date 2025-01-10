@@ -77,8 +77,8 @@ export const useResetReactQuery = () => {
 
 interface CreateMutationProps<T, V> {
   mutationFn: (data: T) => Promise<V>;
-  onSuccess?: (data: V) => void;
-  onError?: (error: Error) => void;
+  onSuccess?: Parameters<typeof useMutation>['0']['onSuccess'];
+  onError?: Parameters<typeof useMutation>['0']['onError'];
 }
 
 export const useCreateReactMutation = <T, V>({

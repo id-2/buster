@@ -116,9 +116,6 @@ export const PermissionListPermissionGroupContainer: React.FC<{
           showSelectAll={false}
           selectedRowKeys={selectedRowKeys}
           onSelectChange={setSelectedRowKeys}
-          onScrollEnd={() => {
-            console.log('scrolled');
-          }}
           emptyState={<div className="py-12">No teams found</div>}
         />
       </div>
@@ -139,6 +136,7 @@ const useStyles = createStyles(({ css, token }) => ({
 const PermissionGroupInfoCell = React.memo(({ name }: { name: string }) => {
   return <div>{name}</div>;
 });
+PermissionGroupInfoCell.displayName = 'PermissionGroupInfoCell';
 
 const options = [
   {
