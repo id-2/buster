@@ -1,21 +1,17 @@
 'use client';
 
-import { useGetDatasetPermissionsOverview } from '@/api/busterv2/datasets';
 import React from 'react';
+import { Title, Text } from '@/components/text';
 
-export const PermissionTitleCard: React.FC<{ datasetId: string }> = ({ datasetId }) => {
-  const { data, isFetched } = useGetDatasetPermissionsOverview(datasetId);
-  const users = data?.users;
-
+export const PermissionTitleCard: React.FC<{}> = React.memo(({}) => {
   return (
-    <div>
-      {isFetched ? (
-        <div>
-          <h1>Permission Title Card {users?.length}</h1>
-        </div>
-      ) : (
-        <div>Loading...</div>
-      )}
+    <div className="flex flex-col gap-1.5">
+      <Title level={3}>Dataset Permissions</Title>
+      <Text style={{ fontSize: '15px' }} type="secondary">
+        Manage who can build dashboards & metrics using this dataset
+      </Text>
     </div>
   );
-};
+});
+
+PermissionTitleCard.displayName = 'PermissionTitleCard';

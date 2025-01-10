@@ -165,6 +165,8 @@ export const ThreadItemsContainer: React.FC<{
     []
   );
 
+  console.log(threadsByDate);
+
   return (
     <div
       ref={tableContainerRef}

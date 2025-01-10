@@ -10,14 +10,14 @@ export enum EditorApps {
 }
 
 const options = [
-  { label: 'Preview', value: EditorApps.PREVIEW },
+  { label: 'SQL', value: EditorApps.PREVIEW },
   { label: 'Metadata', value: EditorApps.METADATA }
 ];
 
 export const EditorContainerSubHeader: React.FC<{
   selectedApp: EditorApps;
   setSelectedApp: (app: EditorApps) => void;
-}> = ({ selectedApp, setSelectedApp }) => {
+}> = React.memo(({ selectedApp, setSelectedApp }) => {
   const { styles, cx } = useStyles();
 
   const onSegmentedChange = useMemoizedFn((value: SegmentedValue) => {
@@ -29,7 +29,9 @@ export const EditorContainerSubHeader: React.FC<{
       <AppSegmented options={options} value={selectedApp} onChange={onSegmentedChange} />
     </div>
   );
-};
+});
+
+EditorContainerSubHeader.displayName = 'EditorContainerSubHeader';
 
 const useStyles = createStyles(({ token, css }) => ({
   subHeader: css`

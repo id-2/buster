@@ -8,7 +8,7 @@ import {
 } from './requests';
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { useMemoizedFn } from 'ahooks';
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { getDatasetMetadata_server } from './serverRequests';
 
 export const useGetDatasets = (params?: Parameters<typeof getDatasets>[0]) => {

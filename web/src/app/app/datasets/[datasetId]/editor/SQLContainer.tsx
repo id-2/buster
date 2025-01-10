@@ -114,7 +114,7 @@ const useStyles = createStyles(({ css, token }) => ({
     border: 0.5px solid ${token.colorError};
     padding: 8px 12px;
     border-radius: ${token.borderRadius}px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   `,
   closeButton: css`
     color: ${token.colorError};

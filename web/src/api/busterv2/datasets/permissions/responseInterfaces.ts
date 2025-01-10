@@ -19,8 +19,13 @@ export interface ListPermissionUsersResponse {
 export interface DatasetPermissionOverviewUser {
   id: string;
   name: string;
+  email: string;
   can_query: boolean;
-  lineage: any[];
+  lineage: {
+    name: string;
+    id: string;
+    type: 'user' | 'datasets' | 'permissionGroups';
+  }[][];
 }
 
 export interface DatasetPermissionsOverviewResponse {

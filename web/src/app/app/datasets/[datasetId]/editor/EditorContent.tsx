@@ -39,7 +39,7 @@ export const EditorContent: React.FC<{
   const { runAsync: runQuery, loading: fetchingTempData } = useRequest(
     async () => {
       try {
-        console.log('dataset', sql);
+        setRunSQLError('');
         const res = await runSQL({ data_source_id: dataset?.data_source_id!, sql });
         const data = res.data.data;
         setTempData(data);
