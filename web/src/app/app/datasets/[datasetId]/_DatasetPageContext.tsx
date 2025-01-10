@@ -14,7 +14,9 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
   const datasetResult = useIndividualDataset({ datasetId });
   const datasetSQL = datasetResult.dataset.data?.sql;
-  const [sql, setSQL] = useState<string>(datasetSQL);
+  const datasetYmlFile = datasetResult.dataset.data?.yml_file;
+  const [sql, setSQL] = useState<string>(datasetSQL || '');
+  const [ymlFile, setYmlFile] = useState<string>(datasetYmlFile || '');
 
   const selectedApp = segments;
 
@@ -22,7 +24,11 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
     setSQL(datasetSQL || '');
   }, [datasetSQL]);
 
-  return { sql, selectedApp, setSQL, ...datasetResult };
+  useLayoutEffect(() => {
+    setYmlFile(datasetYmlFile || '');
+  }, [datasetYmlFile]);
+
+  return { sql, ymlFile, selectedApp, setSQL, setYmlFile, ...datasetResult };
 };
 
 const DatasetPageContext = createContext<ReturnType<typeof useDatasetPageContext>>(

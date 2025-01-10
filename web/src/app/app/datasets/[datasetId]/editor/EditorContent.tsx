@@ -5,12 +5,13 @@ import { useDatasetPageContextSelector } from '../_DatasetPageContext';
 import { AppSplitter, AppSplitterRef } from '@/components';
 import { SQLContainer } from './SQLContainer';
 import { DataContainer } from './DataContainer';
-import { useMemoizedFn } from 'ahooks';
+import { useMemoizedFn, useRequest } from 'ahooks';
 import { BusterDatasetData } from '@/api/busterv2/datasets';
 import { timeout } from '@/utils';
 import { EditorApps, EditorContainerSubHeader } from './EditorContainerSubHeader';
 import { createStyles } from 'antd-style';
 import { MetadataContainer } from './MetadataContainer';
+import { runSQL } from '@/api/busterv2';
 export const EditorContent: React.FC<{
   defaultLayout: [string, string];
 }> = ({ defaultLayout }) => {
@@ -22,16 +23,26 @@ export const EditorContent: React.FC<{
   const datasetData = useDatasetPageContextSelector((state) => state.datasetData);
   const sql = useDatasetPageContextSelector((state) => state.sql);
   const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
+  const ymlFile = useDatasetPageContextSelector((state) => state.ymlFile);
+  const setYmlFile = useDatasetPageContextSelector((state) => state.setYmlFile);
 
   const [tempData, setTempData] = useState<BusterDatasetData>(datasetData.data || []);
   const [fetchingTempData, setFetchingTempData] = useState(false);
+  const { runAsync: runQuery } = useRequest(
+    async () => {
+      await timeout(1000);
+      const res = await runSQL({ data_source_id: '123', sql });
+      console.log(res);
+    },
+    { manual: true }
+  );
 
   const fetchingData = fetchingTempData || datasetData.isFetching;
 
   const error = '';
 
   const onRunQuery = useMemoizedFn(async () => {
-    await timeout(1000);
+    await runQuery();
     const heightOfRow = 36;
     const heightOfDataContainer = heightOfRow * (datasetData.data?.length || 0);
     const containerHeight = ref.current?.clientHeight || 0;
@@ -73,7 +84,7 @@ export const EditorContent: React.FC<{
         )}
 
         {selectedApp === EditorApps.METADATA && (
-          <MetadataContainer ymlFile={dataset.data?.yml_file!} />
+          <MetadataContainer ymlFile={ymlFile} setYmlFile={setYmlFile} />
         )}
       </div>
     </div>

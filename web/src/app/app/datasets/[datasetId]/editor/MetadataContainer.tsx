@@ -3,17 +3,18 @@ import { AppCodeEditor } from '@/components/inputs/AppCodeEditor';
 import { createStyles } from 'antd-style';
 import React from 'react';
 
-export const MetadataContainer: React.FC<{ ymlFile: BusterDataset['yml_file'] }> = React.memo(
-  ({ ymlFile }) => {
-    const { styles, cx } = useStyles();
+export const MetadataContainer: React.FC<{
+  ymlFile: string;
+  setYmlFile: (ymlFile: string) => void;
+}> = React.memo(({ ymlFile, setYmlFile }) => {
+  const { styles, cx } = useStyles();
 
-    return (
-      <div className={cx(styles.container, 'flex h-full w-full flex-col overflow-hidden')}>
-        <AppCodeEditor className="overflow-hidden" defaultValue={ymlFile} />
-      </div>
-    );
-  }
-);
+  return (
+    <div className={cx(styles.container, 'flex h-full w-full flex-col overflow-hidden')}>
+      <AppCodeEditor className="overflow-hidden" value={ymlFile} onChange={setYmlFile} />
+    </div>
+  );
+});
 
 MetadataContainer.displayName = 'MetadataContainer';
 
