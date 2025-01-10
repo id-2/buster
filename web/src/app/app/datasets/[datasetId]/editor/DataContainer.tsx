@@ -3,6 +3,7 @@ import { createStyles } from 'antd-style';
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 import AppDataGrid from '@/components/table/AppDataGrid';
+import { IndeterminateLinearLoader } from '@/components/loaders';
 
 export const DataContainer: React.FC<{
   data: BusterDatasetData;
@@ -13,7 +14,14 @@ export const DataContainer: React.FC<{
   const hasData = !isEmpty(data);
 
   return (
-    <div className={cx(styles.container, 'h-full w-full overflow-hidden', className)}>
+    <div className={cx(styles.container, 'relative h-full w-full overflow-hidden', className)}>
+      <IndeterminateLinearLoader
+        className={cx(
+          'absolute left-0 top-0 z-10 w-full',
+          fetchingData && hasData ? 'block' : '!hidden'
+        )}
+      />
+
       {hasData ? (
         <AppDataGrid rows={data} />
       ) : (

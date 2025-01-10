@@ -2,7 +2,7 @@
 
 import { useIndividualDataset } from '@/context/Datasets';
 import { useSelectedLayoutSegment } from 'next/navigation';
-import React, { PropsWithChildren, useEffect, useLayoutEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { DatasetApps } from './_config';
 import {
   createContext,
@@ -13,8 +13,8 @@ import {
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
   const { dataset, datasetData } = useIndividualDataset({ datasetId });
-  const originalDatasetSQL = dataset.data?.sql;
-  const datasetYmlFile = dataset.data?.yml_file;
+  const originalDatasetSQL = dataset?.data?.sql;
+  const datasetYmlFile = dataset?.data?.yml_file;
 
   const [sql, setSQL] = useState<string>(originalDatasetSQL || '');
   const [ymlFile, setYmlFile] = useState<string>(datasetYmlFile || '');

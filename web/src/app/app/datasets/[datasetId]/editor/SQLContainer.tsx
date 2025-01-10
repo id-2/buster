@@ -36,7 +36,12 @@ export const SQLContainer: React.FC<{
 
   return (
     <div className={cx(styles.container, 'flex h-full w-full flex-col overflow-hidden', className)}>
-      <AppCodeEditor className="overflow-hidden" value={datasetSQL} onChange={setDatasetSQL} />
+      <AppCodeEditor
+        className="overflow-hidden"
+        value={datasetSQL}
+        onChange={setDatasetSQL}
+        onMetaEnter={onRunQueryPreflight}
+      />
       <Divider className="!my-0" />
       <div className="relative flex items-center justify-between px-4 py-2.5">
         <Button type="default" onClick={onCopySQL}>

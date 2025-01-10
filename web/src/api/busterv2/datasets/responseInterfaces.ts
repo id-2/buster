@@ -1,4 +1,4 @@
-import { DataSource } from '../datasources';
+import { DataSource, DataSourceTypes } from '../datasources';
 
 export interface BusterDatasetListItem {
   id: string;
@@ -28,6 +28,9 @@ export type BusterDataset = {
   name: string;
   sql: string;
   yml_file: string;
+  data_source_id: string;
+  data_source_name: string;
+  data_source_type: DataSourceTypes;
 };
 
 export interface BusterDatasetColumn {

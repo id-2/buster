@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useDatasetPageContextSelector } from '../_DatasetPageContext';
 import { AppSplitter, AppSplitterRef } from '@/components';
 import { SQLContainer } from './SQLContainer';
@@ -12,6 +12,9 @@ import { EditorApps, EditorContainerSubHeader } from './EditorContainerSubHeader
 import { createStyles } from 'antd-style';
 import { MetadataContainer } from './MetadataContainer';
 import { runSQL } from '@/api/busterv2';
+import { RustApiError } from '@/api/buster/errors';
+import isEmpty from 'lodash/isEmpty';
+
 export const EditorContent: React.FC<{
   defaultLayout: [string, string];
 }> = ({ defaultLayout }) => {
@@ -20,35 +23,51 @@ export const EditorContent: React.FC<{
   const splitterRef = useRef<AppSplitterRef>(null);
   const [selectedApp, setSelectedApp] = useState<EditorApps>(EditorApps.PREVIEW);
   const datasetData = useDatasetPageContextSelector((state) => state.datasetData);
+  const { data: dataset } = useDatasetPageContextSelector((state) => state.dataset);
   const sql = useDatasetPageContextSelector((state) => state.sql);
   const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
   const ymlFile = useDatasetPageContextSelector((state) => state.ymlFile);
   const setYmlFile = useDatasetPageContextSelector((state) => state.setYmlFile);
 
   const [tempData, setTempData] = useState<BusterDatasetData>(datasetData.data || []);
-  const [fetchingTempData, setFetchingTempData] = useState(false);
+  const [runSQLError, setRunSQLError] = useState<string>('');
 
-  const { runAsync: runQuery } = useRequest(
+  const shownData = useMemo(() => {
+    return isEmpty(tempData) ? datasetData.data || [] : tempData;
+  }, [tempData, datasetData.data]);
+
+  const { runAsync: runQuery, loading: fetchingTempData } = useRequest(
     async () => {
-      await timeout(1000);
-      const res = await runSQL({ data_source_id: '123', sql });
-      console.log(res);
+      try {
+        console.log('dataset', sql);
+        const res = await runSQL({ data_source_id: dataset?.data_source_id!, sql });
+        const data = res.data.data;
+        setTempData(data);
+        return data;
+      } catch (error) {
+        setRunSQLError((error as unknown as RustApiError)?.message || 'Something went wrong');
+      }
     },
     { manual: true }
   );
 
-  const fetchingData = fetchingTempData || datasetData.isFetching;
-
-  const error = '';
+  const fetchingInitialData = datasetData.isFetching;
 
   const onRunQuery = useMemoizedFn(async () => {
-    await runQuery();
-    const heightOfRow = 36;
-    const heightOfDataContainer = heightOfRow * (datasetData.data?.length || 0);
-    const containerHeight = ref.current?.clientHeight || 0;
-    const maxHeight = Math.floor(containerHeight * 0.6);
-    const finalHeight = Math.min(heightOfDataContainer, maxHeight);
-    splitterRef.current?.setSplitSizes(['auto', `${finalHeight}px`]);
+    try {
+      const result = await runQuery();
+      if (result && result.length > 0) {
+        const headerHeight = 50;
+        const heightOfRow = 36;
+        const heightOfDataContainer = headerHeight + heightOfRow * (result.length || 0);
+        const containerHeight = ref.current?.clientHeight || 0;
+        const maxHeight = Math.floor(containerHeight * 0.6);
+        const finalHeight = Math.min(heightOfDataContainer, maxHeight);
+        splitterRef.current?.setSplitSizes(['auto', `${finalHeight}px`]);
+      }
+    } catch (error) {
+      //
+    }
   });
 
   return (
@@ -63,15 +82,15 @@ export const EditorContent: React.FC<{
                 className="mb-3"
                 datasetSQL={sql}
                 setDatasetSQL={setSQL}
-                error={error}
+                error={runSQLError}
                 onRunQuery={onRunQuery}
               />
             }
             rightChildren={
               <DataContainer
                 className="mt-3"
-                data={datasetData.data!}
-                fetchingData={fetchingData}
+                data={shownData}
+                fetchingData={fetchingInitialData || fetchingTempData}
               />
             }
             split="horizontal"

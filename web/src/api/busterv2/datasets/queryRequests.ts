@@ -54,11 +54,12 @@ export const useGetDatasetData = (datasetId: string) => {
 
 export const useGetDatasetMetadata = (datasetId: string) => {
   const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId));
-  return useCreateReactQuery<BusterDataset>({
+  const res = useCreateReactQuery<BusterDataset>({
     queryKey: ['datasetMetadata', datasetId],
     queryFn,
     enabled: !!datasetId
   });
+  return res;
 };
 
 export const prefetchGetDatasetMetadata = async (
