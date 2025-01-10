@@ -3,7 +3,6 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
-  PointElement,
   LineElement,
   Title,
   Tooltip,
@@ -12,7 +11,14 @@ import {
   Colors,
   LogarithmicScale,
   TimeScale,
-  TimeSeriesScale
+  TimeSeriesScale,
+  PointElement,
+  LineController,
+  BarController,
+  BubbleController,
+  PieController,
+  ScatterController,
+  DoughnutController
 } from 'chart.js';
 import { ChartMountedPlugin } from './core/plugins';
 import ChartDeferred from 'chartjs-plugin-deferred';
@@ -27,6 +33,12 @@ import { DEFAULT_CHART_THEME } from '../configColors';
 const token = busterAppStyleConfig.token!;
 
 ChartJS.register(
+  LineController,
+  BarController,
+  BubbleController,
+  PieController,
+  ScatterController,
+  DoughnutController,
   CategoryScale,
   LinearScale,
   BarElement,
