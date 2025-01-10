@@ -106,9 +106,6 @@ export const PermissionListUserContainer: React.FC<{
           showSelectAll={false}
           selectedRowKeys={selectedRowKeys}
           onSelectChange={setSelectedRowKeys}
-          onScrollEnd={() => {
-            console.log('scrolled');
-          }}
           emptyState={<div className="py-12">No users found</div>}
         />
       </div>

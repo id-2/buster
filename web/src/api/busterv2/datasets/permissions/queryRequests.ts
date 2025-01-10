@@ -1,7 +1,7 @@
 import { useCreateReactQuery, useCreateReactMutation } from '@/api/createReactQuery';
 import {
   getDatasetPermissionsOverview,
-  listDatasetGroups,
+  listDatasetDatasetGroups,
   listPermissionGroups,
   listPermissionUsers,
   updateDatasetGroups,
@@ -44,8 +44,8 @@ export const useListPermissionGroups = (dataset_id: string) => {
   });
 };
 
-export const useListDatasetGroups = (dataset_id: string) => {
-  const queryFn = useMemoizedFn(() => listDatasetGroups({ dataset_id }));
+export const useListDatasetDatasetGroups = (dataset_id: string) => {
+  const queryFn = useMemoizedFn(() => listDatasetDatasetGroups({ dataset_id }));
 
   return useCreateReactQuery({
     queryKey: ['list_dataset_groups', dataset_id],

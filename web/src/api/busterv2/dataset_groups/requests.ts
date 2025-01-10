@@ -8,8 +8,8 @@ export const createDatasetGroup = async (data: { name: string }) => {
   return mainApi.post(`/dataset_groups`, data).then((res) => res.data);
 };
 
-export const updateDatasetGroup = async ({ id, ...data }: { id: string; name: string }) => {
-  return mainApi.put(`/dataset_groups/${id}`, data).then((res) => res.data);
+export const updateDatasetGroup = async (data: { id: string; name: string }[]) => {
+  return mainApi.put(`/dataset_groups`, data).then((res) => res.data);
 };
 
 export const deleteDatasetGroup = async (id: string) => {

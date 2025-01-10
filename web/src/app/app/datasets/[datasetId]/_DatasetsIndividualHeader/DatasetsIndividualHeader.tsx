@@ -6,48 +6,37 @@ import { PreventNavigation } from '@/components';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppContentHeader } from '../../../_components/AppContentHeader';
-import { DatasetApps } from '../_config';
 import { useMemoizedFn } from 'ahooks';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
 import { DatasetBreadcrumb } from './DatasetBreadcrumb';
 import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
+import { useDatasetPageContextSelector } from '../_DatasetPageContext';
 
-export const DatasetsIndividualHeader: React.FC<{
-  selectedApp: DatasetApps;
-  datasetId: string | undefined;
-  datasetSQL: string | undefined;
-  setSQL: (sql: string) => void;
-  sql: string | undefined;
-  datasetName: string | undefined;
-}> = React.memo(({ sql, setSQL, selectedApp, datasetId, datasetSQL, datasetName }) => {
+export const DatasetsIndividualHeader: React.FC<{}> = React.memo(({}) => {
+  const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
+  const dataset = useDatasetPageContextSelector((state) => state.dataset);
+  const onPublishDataset = useDatasetPageContextSelector((state) => state.onPublishDataset);
+  const resetDataset = useDatasetPageContextSelector((state) => state.resetDataset);
+  const disablePublish = useDatasetPageContextSelector((state) => state.disablePublish);
+  const isChangedSQL = useDatasetPageContextSelector((state) => state.isChangedSQL);
+  const datasetId = useDatasetPageContextSelector((state) => state.datasetId);
+
+  const datasetName = dataset?.data?.name;
+
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const setOpenNewDatasetModal = useDatasetContextSelector((state) => state.setOpenNewDatasetModal);
-
-  const disablePublish = useMemo(() => {
-    const originalSQL = datasetSQL || '';
-    return !datasetId || !sql || originalSQL === sql;
-  }, [datasetSQL, sql, datasetId]);
 
   const preventNavigation = !disablePublish;
 
   const onReset = useMemoizedFn(() => {
-    setSQL(datasetSQL || '');
-  });
-
-  const onPublishDataset = useMemoizedFn(async () => {
-    // setOpenPublishModal(true);
-    alert('TODO: Publish dataset');
+    resetDataset();
   });
 
   const onCancelPreventNavigation = useMemoizedFn(async () => {
     setTimeout(() => {
       onReset();
     }, 300);
-  });
-
-  useHotkeys('d', () => {
-    setOpenNewDatasetModal(true);
   });
 
   return (
@@ -70,7 +59,7 @@ export const DatasetsIndividualHeader: React.FC<{
             <Divider type="vertical" className="!h-4" />
 
             <div className="flex items-center space-x-2">
-              <Button type="text" onClick={onReset} disabled={sql === datasetSQL}>
+              <Button type="text" onClick={onReset} disabled={!isChangedSQL}>
                 Reset
               </Button>
               <Button type="primary" disabled={disablePublish} onClick={onPublishDataset}>

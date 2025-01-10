@@ -15,7 +15,7 @@ export const listPermissionGroups = async ({
   return await mainApi.get(`/datasets/${dataset_id}/permission_groups`).then((res) => res.data);
 };
 
-export const listDatasetGroups = async ({
+export const listDatasetDatasetGroups = async ({
   dataset_id
 }: {
   dataset_id: string;

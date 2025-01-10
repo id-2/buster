@@ -50,3 +50,7 @@ export const deployDataset = async ({
     .post(`/datasets/deploy`, { id: dataset_id, ...params })
     .then((res) => res.data);
 };
+
+export const updateDataset = async (data: { id: string; name: string }) => {
+  return await mainApi.put(`/datasets/${data.id}`, data).then((res) => res.data);
+};

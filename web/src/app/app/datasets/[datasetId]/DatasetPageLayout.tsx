@@ -17,21 +17,9 @@ export const DatasetPageLayout: React.FC<{ children: React.ReactNode; datasetId:
 };
 
 const LayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const sql = useDatasetPageContextSelector((state) => state.sql);
-  const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
-  const dataset = useDatasetPageContextSelector((state) => state.dataset);
-  const setSQL = useDatasetPageContextSelector((state) => state.setSQL);
-
   return (
     <>
-      <DatasetsIndividualHeader
-        selectedApp={selectedApp}
-        sql={sql}
-        datasetId={dataset?.data?.id}
-        datasetSQL={dataset?.data?.sql}
-        datasetName={dataset?.data?.name}
-        setSQL={setSQL}
-      />
+      <DatasetsIndividualHeader />
       <AppContent>{children}</AppContent>
     </>
   );

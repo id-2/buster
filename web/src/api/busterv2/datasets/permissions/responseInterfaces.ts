@@ -13,6 +13,7 @@ export interface ListDatasetGroupsResponse {
 export interface ListPermissionUsersResponse {
   id: string;
   name: string;
+  email: string;
   assigned: boolean;
 }
 

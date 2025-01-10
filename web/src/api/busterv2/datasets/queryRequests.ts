@@ -4,7 +4,8 @@ import {
   deployDataset,
   getDatasetDataSample,
   getDatasetMetadata,
-  getDatasets
+  getDatasets,
+  updateDataset
 } from './requests';
 import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
 import { useMemoizedFn } from 'ahooks';
@@ -102,14 +103,22 @@ export const useCreateDataset = () => {
 };
 
 export const useDeployDataset = () => {
+  const queryClient = useQueryClient();
   const mutationFn = useMemoizedFn((params: { dataset_id: string; sql: string; yml: string }) =>
     deployDataset(params)
   );
-  const onSuccess = useMemoizedFn((res: any) => {
-    console.log(res);
-  });
+
   return useCreateReactMutation({
     mutationFn,
-    onSuccess
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: ['datasets', {}] });
+      console.log(variables, context);
+    }
+  });
+};
+
+export const useUpdateDataset = () => {
+  return useCreateReactMutation({
+    mutationFn: updateDataset
   });
 };

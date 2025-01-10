@@ -1,15 +1,15 @@
-import { EditableTitle, Title, Text } from '@/components';
-import { useDatasetContextSelector } from '@/context/Datasets';
+import { EditableTitle, Text } from '@/components';
 import React from 'react';
 import { useMemoizedFn } from 'ahooks';
+import { useUpdateDataset } from '@/api/busterv2';
 
 export const OverviewHeader: React.FC<{ datasetId: string; description: string; name: string }> =
   React.memo(({ datasetId, description, name }) => {
-    const onUpdateDataset = useDatasetContextSelector((state) => state.onUpdateDataset);
+    const { mutate: onUpdateDatasetGroup } = useUpdateDataset();
 
     const onEditTitle = useMemoizedFn((value: string) => {
       if (value) {
-        onUpdateDataset({
+        onUpdateDatasetGroup({
           id: datasetId,
           name: value
         });

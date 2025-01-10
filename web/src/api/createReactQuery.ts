@@ -79,14 +79,28 @@ interface CreateMutationProps<T, V> {
   mutationFn: (data: T) => Promise<V>;
   onSuccess?: Parameters<typeof useMutation>['0']['onSuccess'];
   onError?: Parameters<typeof useMutation>['0']['onError'];
+  useErrorNotification?: boolean;
 }
 
 export const useCreateReactMutation = <T, V>({
   mutationFn,
   onSuccess,
-  onError
+  onError,
+  useErrorNotification = true
 }: CreateMutationProps<T, V>) => {
-  return useMutation({ mutationFn, onSuccess, onError });
+  const { openErrorNotification } = useBusterNotifications();
+  const res = useMutation({ mutationFn, onSuccess, onError });
+
+  useEffect(() => {
+    if (res.error && useErrorNotification) {
+      const errorMessage = res.error as RustApiError;
+      openErrorNotification({
+        message: errorMessage.message
+      });
+    }
+  }, [res.error, useErrorNotification]);
+
+  return res;
 };
 
 interface PaginatedQueryProps<T> extends CreateQueryProps<T> {

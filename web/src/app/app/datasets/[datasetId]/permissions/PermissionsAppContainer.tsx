@@ -4,10 +4,10 @@ import React, { useMemo, useState } from 'react';
 import { PermissionAppSegments } from './PermissionAppSegments';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PermissionApps } from './config';
-import { PermissionDatasetGroups } from './_PermissionDatasetGroups/PermissionDatasetGroups';
+import { PermissionDatasetGroups } from './_PermissionDatasetGroups';
 import { PermissionOverview } from './_PermissionOverview';
-import { PermissionPermissionGroup } from './_PermissionPermissionGroup/PermissionPermissionGroup';
-import { PermissionUsers } from './PermissionUsers';
+import { PermissionPermissionGroup } from './_PermissionPermissionGroup';
+import { PermissionUsers } from './_PermissionUsers';
 
 const selectedAppComponent: Record<PermissionApps, React.FC<{ datasetId: string }>> = {
   [PermissionApps.OVERVIEW]: PermissionOverview,
