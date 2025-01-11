@@ -9,19 +9,13 @@ export enum BusterAppRoutes {
   APP_DASHBOARD_ID = '/app/dashboards/:dashboardId',
   APP_DASHBOARD_THREADS = '/app/dashboards/:dashboardId/metrics',
   APP_DASHBOARD_THREADS_ID = '/app/dashboards/:dashboardId/metrics/:threadId',
-  APP_USERS_AND_PERMISSIONS = '/app/users-and-permissions',
-  APP_USERS = '/app/users-and-permissions/users',
-  APP_USERS_ID = '/app/users-and-permissions//users/:userId',
-  APP_PERMISSIONS = '/app/users-and-permissions//permission-groups',
-  APP_PERMISSIONS_ID = '/app/users-and-permissions//permission-groups/:permissionId',
-  APP_TEAMS = '/app/users-and-permissions/teams',
-  APP_TEAMS_ID = '/app/users-and-permissions/teams/:teamId',
+
   APP_LOGS = '/app/logs',
   APP_DATASETS = '/app/datasets',
   APP_DATASETS_ID = '/app/datasets/:datasetId',
   APP_DATASETS_ID_OVERVIEW = '/app/datasets/:datasetId/overview',
-  APP_DATASETS_ID_DESCRIPTIONS = '/app/datasets/:datasetId/descriptions',
-  APP_DATASETS_ID_SQL = '/app/datasets/:datasetId/sql',
+  APP_DATASETS_ID_PERMISSIONS = '/app/datasets/:datasetId/permissions',
+  APP_DATASETS_ID_EDITOR = '/app/datasets/:datasetId/editor',
   APP_TERMS = '/app/terms',
   APP_TERMS_ID = '/app/terms/:termId',
   SETTINGS = '/app/settings',
@@ -93,29 +87,17 @@ export type BusterAppRoutesWithArgs = {
   [BusterAppRoutes.SETTINGS_DATASOURCES_ADD]: { route: BusterAppRoutes.SETTINGS_DATASOURCES_ADD };
   [BusterAppRoutes.APP_DATASETS_ID]: { route: BusterAppRoutes.APP_DATASETS_ID; datasetId: string };
   [BusterAppRoutes.APP_LOGS]: { route: BusterAppRoutes.APP_LOGS };
-  [BusterAppRoutes.APP_USERS]: { route: BusterAppRoutes.APP_USERS };
   [BusterAppRoutes.APP_TERMS_ID]: { route: BusterAppRoutes.APP_TERMS_ID; termId: string };
-  [BusterAppRoutes.APP_USERS_ID]: { route: BusterAppRoutes.APP_USERS_ID; userId: string };
-  [BusterAppRoutes.APP_PERMISSIONS]: { route: BusterAppRoutes.APP_PERMISSIONS };
-  [BusterAppRoutes.APP_PERMISSIONS_ID]: {
-    route: BusterAppRoutes.APP_PERMISSIONS_ID;
-    permissionId: string;
-  };
-  [BusterAppRoutes.APP_TEAMS]: { route: BusterAppRoutes.APP_TEAMS };
-  [BusterAppRoutes.APP_TEAMS_ID]: { route: BusterAppRoutes.APP_TEAMS_ID; teamId: string };
-  [BusterAppRoutes.APP_USERS_AND_PERMISSIONS]: {
-    route: BusterAppRoutes.APP_USERS_AND_PERMISSIONS;
-  };
   [BusterAppRoutes.APP_DATASETS_ID_OVERVIEW]: {
     route: BusterAppRoutes.APP_DATASETS_ID_OVERVIEW;
     datasetId: string;
   };
-  [BusterAppRoutes.APP_DATASETS_ID_DESCRIPTIONS]: {
-    route: BusterAppRoutes.APP_DATASETS_ID_DESCRIPTIONS;
+  [BusterAppRoutes.APP_DATASETS_ID_PERMISSIONS]: {
+    route: BusterAppRoutes.APP_DATASETS_ID_PERMISSIONS;
     datasetId: string;
   };
-  [BusterAppRoutes.APP_DATASETS_ID_SQL]: {
-    route: BusterAppRoutes.APP_DATASETS_ID_SQL;
+  [BusterAppRoutes.APP_DATASETS_ID_EDITOR]: {
+    route: BusterAppRoutes.APP_DATASETS_ID_EDITOR;
     datasetId: string;
   };
   [BusterAppRoutes.APP_COLLECTIONS_ID_THREADS_ID]: {

@@ -225,7 +225,8 @@ pub async fn fix_sql_handler(
 
     let fixed_sql = match fixed_sql.await? {
         Ok(fixed_sql) => {
-            let re = regex::Regex::new(r"(?s)```sql(.*?)```").map_err(|e| anyhow!("Regex error: {}", e))?;
+            let re = regex::Regex::new(r"(?s)```sql(.*?)```")
+                .map_err(|e| anyhow!("Regex error: {}", e))?;
             let mut extracted_sql = String::new();
             for cap in re.captures_iter(&fixed_sql) {
                 if let Some(sql) = cap.get(1) {
@@ -233,7 +234,7 @@ pub async fn fix_sql_handler(
                 }
             }
             extracted_sql
-        },
+        }
         Err(e) => return Err(e),
     };
 
@@ -687,25 +688,7 @@ async fn get_user_specified_dataset(
     };
 
     let dataset: Dataset = match datasets::table
-        .select((
-            datasets::id,
-            datasets::name,
-            datasets::database_name,
-            datasets::when_to_use,
-            datasets::when_not_to_use,
-            datasets::type_,
-            datasets::definition,
-            datasets::schema,
-            datasets::enabled,
-            datasets::imported,
-            datasets::data_source_id,
-            datasets::organization_id,
-            datasets::created_by,
-            datasets::updated_by,
-            datasets::created_at,
-            datasets::updated_at,
-            datasets::deleted_at,
-        ))
+        .select(datasets::all_columns)
         .inner_join(
             datasets_to_permission_groups::table
                 .on(datasets::id.eq(datasets_to_permission_groups::dataset_id)),
@@ -756,25 +739,7 @@ async fn get_permissioned_datasets(pool: &PgPool, user_id: &Uuid) -> Result<Vec<
     };
 
     let datasets = match datasets::table
-        .select((
-            datasets::id,
-            datasets::name,
-            datasets::database_name,
-            datasets::when_to_use,
-            datasets::when_not_to_use,
-            datasets::type_,
-            datasets::definition,
-            datasets::schema,
-            datasets::enabled,
-            datasets::imported,
-            datasets::data_source_id,
-            datasets::organization_id,
-            datasets::created_by,
-            datasets::updated_by,
-            datasets::created_at,
-            datasets::updated_at,
-            datasets::deleted_at,
-        ))
+        .select(datasets::all_columns)
         .inner_join(
             datasets_to_permission_groups::table.on(datasets::id
                 .eq(datasets_to_permission_groups::dataset_id)

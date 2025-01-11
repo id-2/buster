@@ -3,17 +3,25 @@ import { Button, Select, SelectProps } from 'antd';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useDataSourceContextSelector } from '@/context/DataSources';
-import { BusterDataset, BusterDatasetListItem } from '@/api/busterv2/datasets';
+import {
+  BusterDatasetListItem,
+  useCreateDataset,
+  useGetDatasets,
+  useUpdateDataset
+} from '@/api/busterv2/datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useRouter } from 'next/navigation';
-import { AppModal, CircleSpinnerLoaderContainer, Text } from '@/components';
+import { AppModal, Text } from '@/components';
 import { useAntToken } from '@/styles/useAntToken';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { formatDate } from '@/utils/date';
-import { DataSourceListItem } from '@/api/busterv2';
-import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
 import { timeout } from '@/utils';
+
+const headerConfig = {
+  title: 'Create a dataset',
+  description: 'Select a datasource to create or import your dataset from.'
+};
 
 export const NewDatasetModal: React.FC<{
   open: boolean;
@@ -23,11 +31,11 @@ export const NewDatasetModal: React.FC<{
   datasourceId?: string;
 }> = React.memo(({ open, onClose, beforeCreate, afterCreate, datasourceId }) => {
   const router = useRouter();
-  const createDataset = useDatasetContextSelector((state) => state.createDataset);
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
   const forceInitDataSourceList = useDataSourceContextSelector(
     (state) => state.forceInitDataSourceList
   );
+  const { mutateAsync: createDataset } = useCreateDataset();
   const [creatingDataset, setCreatingDataset] = React.useState(false);
   const [selectedDatasource, setSelectedDatasource] = React.useState<string | null>(
     datasourceId || null
@@ -39,9 +47,10 @@ export const NewDatasetModal: React.FC<{
     if (creatingDataset || disableSubmit) return;
     setCreatingDataset(true);
     beforeCreate?.();
-    const res = (await createDataset({
+
+    const res = await createDataset({
       data_source_id: selectedDatasource!
-    })) as BusterDataset;
+    });
     if (res.id) {
       onChangePage({
         route: BusterRoutes.APP_DATASETS_ID_OVERVIEW,
@@ -71,26 +80,23 @@ export const NewDatasetModal: React.FC<{
     }
   }, [open]);
 
+  const footerConfig = useMemo(() => {
+    return {
+      secondaryButton: {
+        text: 'Add a datasource',
+        onClick: onAddDataSourceClick
+      },
+      primaryButton: {
+        text: 'Create dataset',
+        onClick: createNewDatasetPreflight,
+        loading: creatingDataset,
+        disabled: disableSubmit
+      }
+    };
+  }, [creatingDataset, disableSubmit]);
+
   return (
-    <AppModal
-      open={open}
-      onClose={onClose}
-      header={{
-        title: 'Create a dataset',
-        description: 'Select a datasource to create or import your dataset from.'
-      }}
-      footer={{
-        secondaryButton: {
-          text: 'Add a datasource',
-          onClick: onAddDataSourceClick
-        },
-        primaryButton: {
-          text: 'Create dataset',
-          onClick: createNewDatasetPreflight,
-          loading: creatingDataset,
-          disabled: disableSubmit
-        }
-      }}>
+    <AppModal open={open} onClose={onClose} header={headerConfig} footer={footerConfig}>
       {open && (
         <SelectDataSourceDropdown
           setSelectedDatasource={setSelectedDatasource}
@@ -156,13 +162,14 @@ const SelectFromExistingDataset: React.FC<{
   selectedDatasource: string;
 }> = React.memo(({ selectedDatasource }) => {
   const token = useAntToken();
-  const initImportedDatasets = useDatasetContextSelector((state) => state.initImportedDatasets);
-  const importedDatasets = useDatasetContextSelector((state) => state.importedDatasets);
-  const onUpdateDataset = useDatasetContextSelector((state) => state.onUpdateDataset);
+  const { data: importedDatasets, isFetched: isFetchedDatasets } = useGetDatasets({
+    imported: true
+  });
+  const { mutateAsync: onUpdateDataset } = useUpdateDataset();
+
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
 
   const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const columns: BusterListColumn[] = useMemo(() => {
     return [
@@ -203,27 +210,19 @@ const SelectFromExistingDataset: React.FC<{
 
   const onSelectDataset = useMemoizedFn(async (datasetId: string) => {
     setSubmittingId(datasetId);
-    try {
-      await onUpdateDataset({
-        id: datasetId,
-        enabled: true
-      });
-      await timeout(500);
-      onChangePage({
-        route: BusterRoutes.APP_DATASETS_ID,
-        datasetId
-      });
-    } catch (error) {
-      setSubmittingId(null);
-    }
-  });
-
-  useMount(async () => {
-    setLoading(true);
-    if (importedDatasets.length === 0) {
-      await initImportedDatasets();
-    }
-    setLoading(false);
+    // try {
+    //   await onUpdateDataset({
+    //     id: datasetId,
+    //     name: 'test'
+    //   });
+    //   await timeout(500);
+    //   onChangePage({
+    //     route: BusterRoutes.APP_DATASETS_ID,
+    //     datasetId
+    //   });
+    // } catch (error) {
+    //   setSubmittingId(null);
+    // }
   });
 
   return (
@@ -248,7 +247,7 @@ const SelectFromExistingDataset: React.FC<{
           rows={rows}
           showHeader={false}
           emptyState={
-            !loading ? (
+            !isFetchedDatasets ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Text>No datasets found</Text>
               </div>

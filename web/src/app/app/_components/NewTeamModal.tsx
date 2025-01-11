@@ -32,10 +32,6 @@ export const NewTeamModal: React.FC<{
       setDescription('');
       setCreatingTeam(false);
     }, 250);
-    onChangePage({
-      route: BusterRoutes.APP_TEAMS_ID,
-      teamId: res.id
-    });
   });
 
   const onChangeTitle = useMemoizedFn((e: React.ChangeEvent<HTMLInputElement>) => {

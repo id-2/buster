@@ -35,7 +35,7 @@ export const createBusterRoute = ({ route, ...args }: BusterRoutesWithArgsRoute)
   return Object.entries(args).reduce<string>((acc, [key, value]) => {
     acc.replace(`[${key}]`, value as string);
     return acc.replace(`:${key}`, value as string);
-  }, route);
+  }, route || '');
 };
 
 const routeToRegex = (route: string): RegExp => {

@@ -13,11 +13,11 @@ import {
 } from '@fluentui/react-context-selector';
 import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
 import { useBusterMessageDataContextSelector } from '../MessageData';
-import type { SQLRunResponse } from '@/api/busterv2/sql';
 import { useBusterNotifications } from '../BusterNotifications';
 import { didColumnDataChange, simplifyChratConfigForSQLChange } from './helpers';
 import { ThreadUpdateMessage } from '@/api/buster-socket/threads';
 import { timeout } from '@/utils';
+import { RunSQLResponse } from '@/api/busterv2/sql/responseInterfaces';
 
 export const useSQLProvider = () => {
   const busterSocket = useBusterWebSocket();
@@ -51,7 +51,7 @@ export const useSQLProvider = () => {
 
   const _onResponseRunSQL = useMemoizedFn(
     (
-      d: SQLRunResponse,
+      d: RunSQLResponse,
       sql: string,
       { messageId, threadId }: { messageId?: string; threadId?: string }
     ) => {
@@ -110,7 +110,7 @@ export const useSQLProvider = () => {
       threadId?: string;
       sql: string;
     }) => {
-      return new Promise<SQLRunResponse>((resolve, reject) => {
+      return new Promise<RunSQLResponse>((resolve, reject) => {
         busterSocket.emitAndOnce({
           emitEvent: {
             route: '/sql/run',

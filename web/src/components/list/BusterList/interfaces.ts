@@ -1,7 +1,6 @@
 import { MenuProps } from 'antd';
 import type { MenuDividerType } from 'antd/es/menu/interface';
 import type {
-  MenuClickEventHandler,
   MenuItemType as RcMenuItemType,
   SubMenuType as RcSubMenuType
 } from 'rc-menu/lib/interface';

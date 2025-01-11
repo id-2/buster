@@ -1,11 +1,8 @@
-import { DatasetListContent } from './_DatasetListContent';
-import { DatasetHeader } from './_DatasetsHeader';
+import { prefetchGetDatasets } from '@/api/busterv2/datasets';
+import { DatasetsPageContent } from './DatasetsPageContent';
 
-export default function DashboardPage() {
-  return (
-    <>
-      <DatasetHeader />
-      <DatasetListContent />
-    </>
-  );
+export default async function DashboardPage() {
+  await prefetchGetDatasets();
+
+  return <DatasetsPageContent />;
 }

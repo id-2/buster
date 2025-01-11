@@ -4,6 +4,7 @@ import { useTermsContextSelector } from '@/context/Terms';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { AppModal, AppSelectMultiple, Text } from '@/components';
 import { useMemoizedFn } from 'ahooks';
+import { useGetDatasets } from '@/api/busterv2/datasets';
 
 export const NewTermModal: React.FC<{
   open: boolean;
@@ -114,7 +115,7 @@ const DatasetListContainer: React.FC<{
   selectedDatasets: string[];
   setSelectedDatasets: React.Dispatch<React.SetStateAction<string[]>>;
 }> = React.memo(({ selectedDatasets, setSelectedDatasets }) => {
-  const datasetsList = useDatasetContextSelector((state) => state.datasetsList);
+  const { data: datasetsList } = useGetDatasets();
 
   const onChange = useMemoizedFn((v: string[]) => {
     setSelectedDatasets(v);

@@ -340,6 +340,14 @@ impl DatasetType {
             _ => None,
         }
     }
+
+    pub fn to_string(&self) -> &'static str {
+        match *self {
+            DatasetType::Table => "table",
+            DatasetType::View => "view",
+            DatasetType::MaterializedView => "materialized view",
+        }
+    }
 }
 
 impl ToSql<sql_types::DatasetTypeEnum, Pg> for DatasetType {
