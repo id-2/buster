@@ -6,6 +6,7 @@ use diesel_async::RunQueryDsl;
 use serde::Serialize;
 use uuid::Uuid;
 
+use crate::database::schema::users_to_organizations;
 use crate::database::{
     lib::get_pg_pool,
     models::{DatasetGroup, PermissionGroup, User},
@@ -13,6 +14,7 @@ use crate::database::{
 };
 use crate::routes::rest::ApiResponse;
 use crate::utils::security::checks::is_user_workspace_admin_or_data_admin;
+use crate::utils::user::user_info::get_user_organization_id;
 
 #[derive(Debug, Serialize)]
 pub struct AssetWithAssignment {
@@ -44,6 +46,14 @@ pub async fn list_assets(
         }
     }
 
+    let organization_id = match get_user_organization_id(&user.id).await {
+        Ok(id) => id,
+        Err(e) => {
+            tracing::error!("Error getting user organization id: {:?}", e);
+            return Err((StatusCode::INTERNAL_SERVER_ERROR, "Database error"));
+        }
+    };
+
     let mut conn = get_pg_pool().get().await.map_err(|e| {
         tracing::error!("Error getting database connection: {:?}", e);
         (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
@@ -59,12 +69,17 @@ pub async fn list_assets(
                         .and(dataset_permissions::permission_type.eq("user"))
                         .and(dataset_permissions::deleted_at.is_null())),
                 )
+                .inner_join(
+                    users_to_organizations::table.on(users_to_organizations::user_id.eq(users::id)),
+                )
                 .select((
                     users::all_columns,
                     diesel::dsl::sql::<diesel::sql_types::Bool>(
                         "dataset_permissions.id IS NOT NULL",
                     ),
                 ))
+                .filter(dataset_permissions::organization_id.eq(organization_id))
+                .filter(users_to_organizations::organization_id.eq(organization_id))
                 .load::<(User, bool)>(&mut *conn)
                 .await
                 .map_err(|e| {
@@ -101,6 +116,8 @@ pub async fn list_assets(
                     ),
                 ))
                 .filter(permission_groups::deleted_at.is_null())
+                .filter(dataset_permissions::organization_id.eq(organization_id))
+                .filter(permission_groups::organization_id.eq(organization_id))
                 .load::<(PermissionGroup, bool)>(&mut *conn)
                 .await
                 .map_err(|e| {
@@ -136,6 +153,8 @@ pub async fn list_assets(
                         "dataset_permissions.id IS NOT NULL",
                     ),
                 ))
+                .filter(dataset_groups::organization_id.eq(organization_id))
+                .filter(dataset_permissions::organization_id.eq(organization_id))
                 .filter(dataset_groups::deleted_at.is_null())
                 .load::<(DatasetGroup, bool)>(&mut *conn)
                 .await
