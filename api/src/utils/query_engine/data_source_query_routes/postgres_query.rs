@@ -122,7 +122,7 @@ async fn process_batch(
                     "INT8" => DataType::Int8(row.try_get::<i64, _>(i).ok()),
                     "INT4" => DataType::Int4(row.try_get::<i32, _>(i).ok()),
                     "INT2" => DataType::Int2(row.try_get::<i16, _>(i).ok()),
-                    "TEXT" | "VARCHAR" => DataType::Text(row.try_get::<String, _>(i).ok()),
+                    "TEXT" | "VARCHAR" | "USER-DEFINED" => DataType::Text(row.try_get::<String, _>(i).ok()),
                     "FLOAT4" => DataType::Float4(row.try_get::<f32, _>(i).ok()),
                     "FLOAT8" => DataType::Float8(row.try_get::<f64, _>(i).ok()),
                     "NUMERIC" => {
