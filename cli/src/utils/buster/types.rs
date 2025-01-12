@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::utils::profiles::Credential;
 
@@ -22,8 +23,11 @@ pub struct PostDataSourcesRequest {
 
 #[derive(Debug, Serialize)]
 pub struct DeployDatasetsRequest {
+    pub id: Option<Uuid>,
     pub data_source_name: String,
     pub env: String,
+    #[serde(rename = "type")]
+    pub type_: String,
     pub name: String,
     pub model: Option<String>,
     pub schema: String,
@@ -31,7 +35,7 @@ pub struct DeployDatasetsRequest {
     pub sql_definition: Option<String>,
     pub entity_relationships: Option<Vec<DeployDatasetsEntityRelationshipsRequest>>,
     pub columns: Vec<DeployDatasetsColumnsRequest>,
-    pub yml_file: String,
+    pub yml_file: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

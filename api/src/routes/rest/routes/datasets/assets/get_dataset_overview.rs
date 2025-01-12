@@ -16,6 +16,7 @@ use crate::database::{
 };
 use crate::routes::rest::ApiResponse;
 use crate::utils::security::checks::is_user_workspace_admin_or_data_admin;
+use crate::utils::user::user_info::get_user_organization_id;
 
 #[derive(Debug, Serialize)]
 pub struct UserPermissionLineage {
@@ -62,11 +63,20 @@ pub async fn get_dataset_overview(
         (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })?;
 
+    let organization_id = match get_user_organization_id(&user.id).await {
+        Ok(id) => id,
+        Err(e) => {
+            tracing::error!("Error getting user organization id: {:?}", e);
+            return Err((StatusCode::INTERNAL_SERVER_ERROR, "Database error"));
+        }
+    };
+
     // Get all active users in the organization
     let users = users_to_organizations::table
         .inner_join(users::table.on(users_to_organizations::user_id.eq(users::id)))
         .filter(users_to_organizations::status.eq(UserOrganizationStatus::Active))
         .filter(users_to_organizations::deleted_at.is_null())
+        .filter(users_to_organizations::organization_id.eq(organization_id))
         .select((
             users::id,
             users::email,

@@ -162,7 +162,9 @@ pub async fn upload_model_files(
                 sql_definition: Some(model.sql_definition.clone()),
                 entity_relationships: Some(entity_relationships),
                 columns,
-                yml_file: model.yml_content.clone(),
+                yml_file: Some(model.yml_content.clone()),
+                id: None,
+                type_: String::from("view"),
             };
 
             post_datasets_req_body.push(dataset);

@@ -124,6 +124,11 @@ pub async fn deploy_datasets(
     Extension(user): Extension<User>,
     Json(request): Json<DeployDatasetsRequest>,
 ) -> Result<ApiResponse<DeployDatasetsResponse>, (axum::http::StatusCode, String)> {
+    let is_simple = match request {
+        DeployDatasetsRequest::Full(_) => false,
+        DeployDatasetsRequest::Simple { .. } => true,
+    };
+
     let requests = match process_deploy_request(request).await {
         Ok(requests) => requests,
         Err(e) => {
@@ -132,7 +137,7 @@ pub async fn deploy_datasets(
         }
     };
 
-    let _ = match deploy_datasets_handler(&user.id, requests).await {
+    let _ = match deploy_datasets_handler(&user.id, requests, is_simple).await {
         Ok(dataset) => dataset,
         Err(e) => {
             tracing::error!("Error creating dataset: {:?}", e);
@@ -215,6 +220,7 @@ async fn process_deploy_request(
 async fn deploy_datasets_handler(
     user_id: &Uuid,
     requests: Vec<FullDeployDatasetsRequest>,
+    is_simple: bool,
 ) -> Result<()> {
     // Get the user organization id.
     let organization_id = get_user_organization_id(&user_id).await?;
@@ -452,8 +458,6 @@ async fn deploy_datasets_handler(
         }
     }
 
-    println!("columns_to_upsert: {:?}", columns_to_upsert);
-
     // Dedupe columns based on dataset_id and name
     let columns_to_upsert: Vec<DatasetColumn> = {
         let mut seen = HashSet::new();
@@ -565,17 +569,19 @@ async fn deploy_datasets_handler(
             .map_err(|e| anyhow!("Failed to upsert entity relationships: {}", e))?;
     }
 
-    for dataset in inserted_datasets {
-        let view_name = format!("{}.{}", dataset.schema, dataset.database_name);
-        let view_sql = format!(
-            "CREATE {} {} AS {}",
-            dataset.type_.to_string(),
-            view_name,
-            dataset.definition
-        );
+    if is_simple {
+        for dataset in inserted_datasets {
+            let view_name = format!("{}.{}", dataset.schema, dataset.database_name);
+            let view_sql = format!(
+                "CREATE {} {} AS {}",
+                dataset.type_.to_string(),
+                view_name,
+                dataset.definition
+            );
 
-        // Write the view to the data source
-        write_query_engine(&dataset.id, &view_sql).await?;
+            // Write the view to the data source
+            write_query_engine(&dataset.id, &view_sql).await?;
+        }
     }
 
     // TODO: Need to send back the updated and inserated objects.
