@@ -3,15 +3,14 @@
 //https://github.com/popsql/monaco-sql-languages/blob/main/example/src/App.js#L2
 //https://dtstack.github.io/monaco-sql-languages/
 
-import React, { forwardRef, useContext, useLayoutEffect, useMemo } from 'react';
+import React, { forwardRef, useLayoutEffect, useMemo } from 'react';
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import dynamic from 'next/dynamic';
 import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 import { useBusterStylesContext } from '@/context/BusterStyles/BusterStyles';
 import { createStyles } from 'antd-style';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useMemoizedFn } from 'ahooks';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 //import GithubLightTheme from 'monaco-themes/themes/Github Light.json';
 //import NightOwnTheme from 'monaco-themes/themes/Night Owl.json';
@@ -112,9 +111,6 @@ export const AppCodeEditor = forwardRef<AppCodeEditorHandle, AppCodeEditorProps>
           value: readOnlyMessage
         },
         ...monacoEditorOptions
-        // scrollbar: {
-        //   alwaysConsumeMouseWheel: false
-        // },
       };
     }, [readOnlyMessage, monacoEditorOptions]);
 

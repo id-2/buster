@@ -170,25 +170,7 @@ async fn get_dataset_and_columns(
         .filter(datasets::id.eq(dataset_id.as_ref()))
         .filter(datasets::deleted_at.is_null())
         .select((
-            (
-                datasets::id,
-                datasets::name,
-                datasets::database_name,
-                datasets::when_to_use.nullable(),
-                datasets::when_not_to_use.nullable(),
-                datasets::type_,
-                datasets::definition,
-                datasets::schema,
-                datasets::enabled,
-                datasets::imported,
-                datasets::data_source_id,
-                datasets::organization_id,
-                datasets::created_by,
-                datasets::updated_by,
-                datasets::created_at,
-                datasets::updated_at,
-                datasets::deleted_at.nullable(),
-            ),
+            datasets::all_columns,
             (
                 dataset_columns::id,
                 dataset_columns::dataset_id,
@@ -393,8 +375,8 @@ pub async fn is_organization_admin_or_owner(
         }
     };
 
-    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::Admin
-        || is_organization_admin == UserOrganizationRole::Owner
+    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::WorkspaceAdmin
+        || is_organization_admin == UserOrganizationRole::DataAdmin
     {
         true
     } else {

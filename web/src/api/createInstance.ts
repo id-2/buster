@@ -22,7 +22,7 @@ export const createInstance = (baseURL: string) => {
     (error: AxiosError) => {
       // console.error(error);
       //Redirect to login if 401 unauthorized error
-      if (error.status === 401 && window) {
+      if (error.status === 401 && typeof window !== 'undefined') {
         window.location.href = BusterRoutes.AUTH_LOGIN;
       }
       return Promise.reject(rustErrorHandler(error));

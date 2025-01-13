@@ -14,17 +14,18 @@ export const pieTooltipHelper = (
   const dataPointDataIndex = dataPoints[0]!.dataIndex;
   const dataPointDatasetIndex = dataPoints[0]!.datasetIndex;
   const dataPointDataset = datasets[dataPointDatasetIndex!];
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
+  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
 
   const dataPointIsInTooltip = tooltipDatasets.some(
     (dataset) => dataset.label === dataPointDataset.label
   );
 
   if (!dataPointIsInTooltip) {
-    return [];
+    //  console.warn('TODO: handle data point not in tooltip');
+    //I removed the early return because if tooltip only had non plotted values it would not show
   }
 
-  return tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
+  const tooltipItems = tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
     const isActiveDataset = tooltipDataset.label === dataPointDataset.label;
     const color = isActiveDataset
       ? (dataPointDataset.backgroundColor as string[])[dataPointDataIndex]
@@ -62,6 +63,8 @@ export const pieTooltipHelper = (
       values: [{ formattedValue, formattedLabel, formattedPercentage }]
     };
   });
+
+  return tooltipItems;
 };
 
 export const getPiePercentage = (
@@ -72,9 +75,12 @@ export const getPiePercentage = (
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ): string => {
-  const compareValue = datasetData[dataPointDataIndex] as number;
   const totalizer = chart.$totalizer;
+  // const numberOfTotalizerSeries = totalizer.seriesTotals.length;
+  //  const index = numberOfTotalizerSeries - datasetIndex;
   const total = totalizer.seriesTotals[datasetIndex];
+  const compareValue = datasetData[dataPointDataIndex] as number;
   const percentage = (compareValue / total) * 100;
+
   return percentageFormatter(percentage, label, columnLabelFormats);
 };

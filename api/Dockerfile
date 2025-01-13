@@ -22,7 +22,12 @@ RUN apt-get update && apt-get install -y \
     && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY cert.pem /usr/local/share/ca-certificates/cert.crt
+# Create PostgreSQL cert directory
+RUN mkdir -p /root/.postgresql
+
+# Handle certs
+COPY cert.pem* /usr/local/share/ca-certificates/cert.crt
+COPY cert.pem* /root/.postgresql/root.crt
 RUN update-ca-certificates
 
 COPY --from=builder /app/target/release/bi_api .

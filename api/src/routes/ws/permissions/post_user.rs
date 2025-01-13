@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        enums::{SharingSetting, UserOrganizationRole},
+        enums::{SharingSetting, UserOrganizationRole, UserOrganizationStatus},
         lib::{get_pg_pool, UserConfig},
         models::{User, UserToOrganization},
         schema::{users, users_to_organizations},
@@ -109,6 +109,7 @@ async fn post_user_handler(
         created_by: *user_id,
         updated_by: *user_id,
         deleted_by: None,
+        status: UserOrganizationStatus::Active,
     };
 
     let mut conn = get_pg_pool().get().await?;

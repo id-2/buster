@@ -1,12 +1,14 @@
 import tailwind from '../../../../tailwind.config';
 const colors = tailwind.theme.extend.colors;
 
+const editorBackground = '#ffffff';
+
 const theme = {
   base: 'vs',
   inherit: true,
   rules: [
     {
-      background: colors.buster.background.DEFAULT,
+      background: editorBackground,
       token: ''
     },
     {
@@ -338,7 +340,7 @@ const theme = {
   ],
   colors: {
     'editor.foreground': '#24292e',
-    'editor.background': colors.buster.background.base,
+    'editor.background': editorBackground,
     'editor.selectionBackground': '#c8c8fa',
     'editor.inactiveSelectionBackground': '#fafbfc',
     'editor.lineHighlightBackground': '#fafbfc',

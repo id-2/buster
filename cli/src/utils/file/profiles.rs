@@ -44,19 +44,6 @@ pub enum Credential {
 }
 
 impl Credential {
-    pub fn get_db_type(&self) -> String {
-        match self {
-            Credential::Postgres(_) => "postgres".to_string(),
-            Credential::MySQL(_) => "mysql".to_string(),
-            Credential::Bigquery(_) => "bigquery".to_string(),
-            Credential::SqlServer(_) => "sqlserver".to_string(),
-            Credential::Redshift(_) => "redshift".to_string(),
-            Credential::Databricks(_) => "databricks".to_string(),
-            Credential::Snowflake(_) => "snowflake".to_string(),
-            Credential::Starrocks(_) => "starrocks".to_string(),
-        }
-    }
-
     pub fn get_schema(&self) -> String {
         match self {
             Credential::Postgres(cred) => cred.schema.clone(),

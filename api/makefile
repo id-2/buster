@@ -1,5 +1,5 @@
 dev:
-	docker compose up -d
+	cd .. && docker compose up -d redis && cd api && \
 	supabase start
 	ollama serve &
 	ollama pull mxbai-embed-large

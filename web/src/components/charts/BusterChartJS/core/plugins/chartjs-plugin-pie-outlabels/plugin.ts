@@ -71,7 +71,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
 
     // Restore original radius
     const dataset = chart.data.datasets[0];
-    if (dataset && this._isEnabled(chart)) {
+    if (dataset && this._isEnabled(chart) && chart.ctx) {
       //@ts-ignore
       (dataset as ChartDataset<'pie'>).radius = '100%';
       outLabelsManager.setUsedShrink(false);
@@ -205,7 +205,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
   },
 
   defaults: {
-    shrinkPercentage: 0.715,
+    shrinkPercentage: 0.68,
     animateInDuration: 350,
     display: false,
     length: 18,

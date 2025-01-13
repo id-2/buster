@@ -159,6 +159,8 @@ pub struct Dataset {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
+    pub model: Option<String>,
+    pub yml_file: Option<String>,
 }
 
 #[derive(Insertable, Queryable, Associations, Debug)]
@@ -443,6 +445,7 @@ pub struct UserToOrganization {
     pub created_by: Uuid,
     pub updated_by: Uuid,
     pub deleted_by: Option<Uuid>,
+    pub status: UserOrganizationStatus,
 }
 
 #[derive(Queryable, Insertable, Associations, Debug)]
@@ -488,4 +491,28 @@ pub struct EntityRelationship {
     pub foreign_dataset_id: Uuid,
     pub relationship_type: String,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Queryable, Insertable, Debug)]
+#[diesel(table_name = dataset_groups)]
+pub struct DatasetGroup {
+    pub id: Uuid,
+    pub organization_id: Uuid,
+    pub name: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub deleted_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Queryable, Insertable, Debug)]
+#[diesel(table_name = dataset_permissions)]
+pub struct DatasetPermission {
+    pub id: Uuid,
+    pub organization_id: Uuid,
+    pub dataset_id: Uuid,
+    pub permission_id: Uuid,
+    pub permission_type: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub deleted_at: Option<DateTime<Utc>>,
 }

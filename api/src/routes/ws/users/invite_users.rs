@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        enums::{SharingSetting, TeamToUserRole, UserOrganizationRole},
+        enums::{SharingSetting, TeamToUserRole, UserOrganizationRole, UserOrganizationStatus},
         lib::{get_pg_pool, UserConfig},
         models::{TeamToUser, User, UserToOrganization},
         schema::{teams_to_users, users, users_to_organizations},
@@ -97,7 +97,8 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
             let user_to_organization = UserToOrganization {
                 user_id: new_user.id,
                 organization_id: organization.id,
-                role: UserOrganizationRole::Member,
+                role: UserOrganizationRole::Querier,
+                status: UserOrganizationStatus::Active,
                 created_at: Utc::now(),
                 updated_at: Utc::now(),
                 sharing_setting: SharingSetting::Public,

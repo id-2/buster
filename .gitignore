@@ -56,3 +56,4 @@ Cargo.lock
 *.pdb
 
 *.env
+.DS_Store

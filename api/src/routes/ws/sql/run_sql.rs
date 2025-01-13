@@ -121,8 +121,8 @@ async fn run_dataset_sql_handler(
         .filter(users_to_organizations::user_id.eq(user_id))
         .filter(
             users_to_organizations::role
-                .eq(UserOrganizationRole::Admin)
-                .or(users_to_organizations::role.eq(UserOrganizationRole::Owner)),
+                .eq(UserOrganizationRole::WorkspaceAdmin)
+                .or(users_to_organizations::role.eq(UserOrganizationRole::DataAdmin)),
         )
         .select(users_to_organizations::user_id)
         .first::<Uuid>(&mut conn)

@@ -1,14 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+'use client';
+
+import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useLayoutEffect } from 'react';
 import mainApi from '@/api/buster/instances';
 import { defaultRequestHandler } from '@/api/createInstance';
 import nextApi from '@/api/next/instances';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
-
-const queryClient = new QueryClient();
+import { getQueryClient } from './getQueryClient';
 
 export const BusterReactQueryProvider = ({ children }: { children: React.ReactElement }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
+  const queryClient = getQueryClient();
 
   useLayoutEffect(() => {
     //reset all request interceptors

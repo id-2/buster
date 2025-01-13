@@ -1,4 +1,4 @@
-import type { SQLRunResponse } from '@/api/busterv2/sql';
+import { RunSQLResponse } from '@/api/busterv2/sql';
 
 export enum SQLResponses {
   '/sql/run:runSql' = '/sql/run:runSql'
@@ -6,7 +6,7 @@ export enum SQLResponses {
 
 export type SQLResponses_runSql = {
   route: '/sql/run:runSql';
-  callback: (d: SQLRunResponse) => void;
+  callback: (d: RunSQLResponse) => void;
   onError?: (d: unknown) => void;
 };
 

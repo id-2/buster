@@ -84,7 +84,9 @@ pub async fn get_message_with_permission(
         }
     };
 
-    let final_permission = if permission.is_none() && !is_public_thread {
+    let final_permission = if permission.is_some() {
+        permission.unwrap()
+    } else if !is_public_thread {
         return Err(anyhow!("No message found with permissions"));
     } else {
         AssetPermissionRole::Viewer
@@ -296,8 +298,8 @@ async fn is_organization_admin_or_owner(user_id: Arc<Uuid>, message_id: Arc<Uuid
         }
     };
 
-    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::Admin
-        || is_organization_admin == UserOrganizationRole::Owner
+    let is_organization_adminig = if is_organization_admin == UserOrganizationRole::WorkspaceAdmin
+        || is_organization_admin == UserOrganizationRole::DataAdmin
     {
         true
     } else {

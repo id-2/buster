@@ -12,9 +12,6 @@ const PRIORITY_ROUTES = [
   BusterAppRoutes.APP_THREAD,
   BusterAppRoutes.APP_DATASETS,
   BusterAppRoutes.SETTINGS_GENERAL,
-  BusterAppRoutes.APP_TEAMS,
-  BusterAppRoutes.APP_USERS,
-  BusterAppRoutes.APP_PERMISSIONS,
   BusterAppRoutes.APP_DASHBOARD_THREADS_ID,
   BusterAppRoutes.APP_DASHBOARD_ID
 ];

@@ -56,7 +56,7 @@ export const DashboardHeader: React.FC<{}> = () => {
   return (
     <>
       <AppContentHeader className="items-center justify-between space-x-2">
-        <div className="flex space-x-1">
+        <div className="flex space-x-3">
           <Breadcrumb className="flex items-center" items={breadcrumbItems} />
           {showFilters && (
             <DashboardFilters

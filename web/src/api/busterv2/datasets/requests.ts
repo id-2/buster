@@ -1,68 +1,56 @@
-import { BASE_URL } from '@/api/buster/instances';
-import { BusterDatasetListItem } from './interfaces';
+import { BusterDataset, BusterDatasetData, BusterDatasetListItem } from './responseInterfaces';
+import { mainApi } from '../../buster';
+import * as config from './config';
 
-interface ListDatasetsAdminParams {
-    jwtToken: string;
-    page?: number;
-    page_size?: number;
-    admin_view?: boolean;
-    enabled?: boolean;
-    imported?: boolean;
-    permission_group_id?: string;
-    belongs_to?: boolean | null;
-}
+export const getDatasets = async (params?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  admin_view?: boolean;
+  imported?: boolean;
+  enabled?: boolean;
+  permission_group_id?: string;
+  belongs_to?: string;
+}): Promise<BusterDatasetListItem[]> => {
+  const { page = 0, page_size = 1000, ...allParams } = params || {};
+  return await mainApi
+    .get<BusterDatasetListItem[]>(`/datasets`, { params: { page, page_size, ...allParams } })
+    .then((res) => res.data);
+};
 
-export const listDatasetsAdmin = async ({
-    jwtToken,
-    page = 0,
-    page_size = 1000,
-    admin_view = true,
-    enabled,
-    imported,
-    permission_group_id,
-    belongs_to
-}: ListDatasetsAdminParams): Promise<BusterDatasetListItem[]> => {
-    try {
-        const params = new URLSearchParams({
-            page: page.toString(),
-            page_size: page_size.toString(),
-            admin_view: admin_view.toString()
-        });
+export const getDatasetMetadata = async (datasetId: string): Promise<BusterDataset> => {
+  return await mainApi
+    .get<BusterDataset>(config.GET_DATASET_URL(datasetId))
+    .then((res) => res.data);
+};
 
-        if (enabled !== undefined) {
-            params.append('enabled', enabled.toString());
-        }
-        if (imported !== undefined) {
-            params.append('imported', imported.toString());
-        }
-        if (permission_group_id) {
-            params.append('permission_group_id', permission_group_id);
-        }
-        if (belongs_to !== undefined && belongs_to !== null) {
-            params.append('belongs_to', belongs_to.toString());
-        }
+export const getDatasetDataSample = async (datasetId: string): Promise<BusterDatasetData> => {
+  return await mainApi
+    .get<BusterDatasetData>(`/datasets/${datasetId}/data/sample`)
+    .then((res) => res.data);
+};
 
-        const response = await fetch(`${BASE_URL}/datasets?${params.toString()}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${jwtToken}`
-            }
-        });
+export const createDataset = async (): Promise<BusterDataset> => {
+  return await mainApi.post<BusterDataset>(`/datasets`).then((res) => res.data);
+};
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch datasets');
-        }
+export const deleteDataset = async (datasetId: string): Promise<void> => {
+  return await mainApi.delete(`/datasets/${datasetId}`).then((res) => res.data);
+};
 
-        const datasets = await response.json();
-        if (Array.isArray(datasets)) {
-            return datasets;
-        }
-        
-        console.warn('Unexpected API response format:', datasets);
-        return [];
-    } catch (error) {
-        console.error('Error fetching datasets:', error);
-        return [];
-    }
-}; 
+export const deployDataset = async ({
+  dataset_id,
+  ...params
+}: {
+  dataset_id: string;
+  sql: string;
+  yml: string;
+}): Promise<void> => {
+  return await mainApi
+    .post(`/datasets/deploy`, { id: dataset_id, ...params })
+    .then((res) => res.data);
+};
+
+export const updateDataset = async (data: { id: string; name: string }) => {
+  return await mainApi.put(`/datasets/${data.id}`, data).then((res) => res.data);
+};

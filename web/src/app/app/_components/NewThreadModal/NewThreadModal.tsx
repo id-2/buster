@@ -12,9 +12,10 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { NewThreadModalDataSourceSelect } from './NewThreadModalDatasourceSelect';
 import { SuggestedPromptsContainer } from './SuggestedPromptsContainer';
 import { NoDatasets } from './NoDatasets';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
+import { useGetDatasets } from '@/api/busterv2/datasets';
 
 const themeConfig: ThemeConfig = {
   components: {
@@ -37,9 +38,7 @@ export const NewThreadModal = React.memo<{
   const threadId: string | undefined = searchParams.threadId as string;
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const { openErrorNotification } = useBusterNotifications();
-  const datasetsList = useDatasetContextSelector((state) => state.datasetsList);
-  const loadingDatasets = useDatasetContextSelector((state) => state.loadingDatasets);
-  const initDatasetsList = useDatasetContextSelector((state) => state.initDatasetsList);
+  const { isFetched: isFetchedDatasets, data: datasetsList } = useGetDatasets();
   const onSetSelectedThreadDataSource = useBusterNewThreadsContextSelector(
     (x) => x.onSetSelectedThreadDataSource
   );
@@ -56,7 +55,7 @@ export const NewThreadModal = React.memo<{
   const [defaultSuggestedPrompts, setDefaultSuggestedPrompts] = useState<BusterSearchResult[]>([]);
   const shownPrompts = prompt.length > 1 ? suggestedPrompts : defaultSuggestedPrompts;
   const lastKeyPressed = useRef<string | null>(null);
-  const hasDatasets = datasetsList.length > 0 && !loadingDatasets;
+  const hasDatasets = datasetsList.length > 0 && isFetchedDatasets;
   const showSuggested = shownPrompts.length > 0 && hasDatasets;
   const [navigatingToThreadId, setNavigatingToThreadId] = useState<string | null>(null);
 
@@ -135,10 +134,6 @@ export const NewThreadModal = React.memo<{
     }
   }, [open]);
 
-  useMount(() => {
-    initDatasetsList({ threadModalView: true });
-  });
-
   return (
     <ConfigProvider theme={themeConfig}>
       <Modal
@@ -156,7 +151,7 @@ export const NewThreadModal = React.memo<{
               onSetSelectedThreadDataSource={onSetSelectedThreadDataSource}
               selectedThreadDataSource={selectedThreadDataSource}
               dataSources={datasetsList}
-              loading={loadingDatasets}
+              loading={!isFetchedDatasets}
             />
 
             <NewThreadInput

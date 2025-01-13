@@ -38,9 +38,11 @@ pub enum MessageFeedback {
 #[diesel(sql_type = sql_types::UserOrganizationRoleEnum)]
 #[serde(rename_all = "camelCase")]
 pub enum UserOrganizationRole {
-    Owner,
-    Member,
-    Admin,
+    WorkspaceAdmin,
+    DataAdmin,
+    Querier,
+    RestrictedQuerier,
+    Viewer,
 }
 
 #[derive(
@@ -57,9 +59,8 @@ pub enum UserOrganizationRole {
 #[diesel(sql_type = sql_types::TeamRoleEnum)]
 #[serde(rename_all = "camelCase")]
 pub enum TeamToUserRole {
-    Owner,
+    Manager,
     Member,
-    Admin,
 }
 
 #[derive(
@@ -96,6 +97,50 @@ impl AssetPermissionRole {
             (AssetPermissionRole::Viewer, AssetPermissionRole::Viewer) => {
                 AssetPermissionRole::Viewer
             }
+        }
+    }
+}
+
+#[derive(
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    diesel::AsExpression,
+    diesel::FromSqlRow,
+)]
+#[diesel(sql_type = sql_types::UserOrganizationStatusEnum)]
+#[serde(rename_all = "camelCase")]
+pub enum UserOrganizationStatus {
+    Active,
+    Inactive,
+    Pending,
+    Guest,
+}
+
+impl ToSql<sql_types::UserOrganizationStatusEnum, Pg> for UserOrganizationStatus {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
+        match *self {
+            UserOrganizationStatus::Active => out.write_all(b"active")?,
+            UserOrganizationStatus::Inactive => out.write_all(b"inactive")?,
+            UserOrganizationStatus::Pending => out.write_all(b"pending")?,
+            UserOrganizationStatus::Guest => out.write_all(b"guest")?,
+        }
+        Ok(IsNull::No)
+    }
+}
+
+impl FromSql<sql_types::UserOrganizationStatusEnum, Pg> for UserOrganizationStatus {
+    fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
+        match bytes.as_bytes() {
+            b"active" => Ok(UserOrganizationStatus::Active),
+            b"inactive" => Ok(UserOrganizationStatus::Inactive),
+            b"pending" => Ok(UserOrganizationStatus::Pending),
+            b"guest" => Ok(UserOrganizationStatus::Guest),
+            _ => Err("Unrecognized enum variant".into()),
         }
     }
 }
@@ -293,6 +338,14 @@ impl DatasetType {
             "view" => Some(DatasetType::View),
             "materializedView" => Some(DatasetType::MaterializedView),
             _ => None,
+        }
+    }
+
+    pub fn to_string(&self) -> &'static str {
+        match *self {
+            DatasetType::Table => "table",
+            DatasetType::View => "view",
+            DatasetType::MaterializedView => "materialized view",
         }
     }
 }
@@ -528,9 +581,11 @@ impl FromSql<sql_types::AssetPermissionRoleEnum, Pg> for AssetPermissionRole {
 impl ToSql<sql_types::UserOrganizationRoleEnum, Pg> for UserOrganizationRole {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         match *self {
-            UserOrganizationRole::Owner => out.write_all(b"owner")?,
-            UserOrganizationRole::Member => out.write_all(b"member")?,
-            UserOrganizationRole::Admin => out.write_all(b"admin")?,
+            UserOrganizationRole::WorkspaceAdmin => out.write_all(b"workspace_admin")?,
+            UserOrganizationRole::DataAdmin => out.write_all(b"data_admin")?,
+            UserOrganizationRole::Querier => out.write_all(b"querier")?,
+            UserOrganizationRole::RestrictedQuerier => out.write_all(b"restricted_querier")?,
+            UserOrganizationRole::Viewer => out.write_all(b"viewer")?,
         }
         Ok(IsNull::No)
     }
@@ -539,9 +594,11 @@ impl ToSql<sql_types::UserOrganizationRoleEnum, Pg> for UserOrganizationRole {
 impl FromSql<sql_types::UserOrganizationRoleEnum, Pg> for UserOrganizationRole {
     fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
         match bytes.as_bytes() {
-            b"owner" => Ok(UserOrganizationRole::Owner),
-            b"member" => Ok(UserOrganizationRole::Member),
-            b"admin" => Ok(UserOrganizationRole::Admin),
+            b"workspace_admin" => Ok(UserOrganizationRole::WorkspaceAdmin),
+            b"data_admin" => Ok(UserOrganizationRole::DataAdmin),
+            b"querier" => Ok(UserOrganizationRole::Querier),
+            b"restricted_querier" => Ok(UserOrganizationRole::RestrictedQuerier),
+            b"viewer" => Ok(UserOrganizationRole::Viewer),
             _ => Err("Unrecognized UserRole".into()),
         }
     }
@@ -551,9 +608,8 @@ impl FromSql<sql_types::UserOrganizationRoleEnum, Pg> for UserOrganizationRole {
 impl ToSql<sql_types::TeamRoleEnum, Pg> for TeamToUserRole {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         match *self {
-            TeamToUserRole::Owner => out.write_all(b"owner")?,
+            TeamToUserRole::Manager => out.write_all(b"manager")?,
             TeamToUserRole::Member => out.write_all(b"member")?,
-            TeamToUserRole::Admin => out.write_all(b"admin")?,
         }
         Ok(IsNull::No)
     }
@@ -562,9 +618,8 @@ impl ToSql<sql_types::TeamRoleEnum, Pg> for TeamToUserRole {
 impl FromSql<sql_types::TeamRoleEnum, Pg> for TeamToUserRole {
     fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
         match bytes.as_bytes() {
-            b"owner" => Ok(TeamToUserRole::Owner),
+            b"manager" => Ok(TeamToUserRole::Manager),
             b"member" => Ok(TeamToUserRole::Member),
-            b"admin" => Ok(TeamToUserRole::Admin),
             _ => Err("Unrecognized UserRole".into()),
         }
     }
