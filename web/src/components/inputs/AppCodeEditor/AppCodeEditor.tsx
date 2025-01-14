@@ -125,9 +125,7 @@ export const AppCodeEditor = forwardRef<AppCodeEditorHandle, AppCodeEditorProps>
         ]);
 
         if (language === 'yaml') {
-          console.log('loading yaml');
           await configureMonacoToUseYaml(monaco);
-          console.log('yaml loaded');
         }
 
         monaco.editor.defineTheme('github-light', GithubLightTheme);
@@ -149,14 +147,6 @@ export const AppCodeEditor = forwardRef<AppCodeEditorHandle, AppCodeEditorProps>
 
         setIsLoading(false);
         hasLoadedDynamicEditor = true;
-
-        // Add this to see how Monaco is tokenizing the text
-        editor.onDidChangeModelContent(() => {
-          const model = editor.getModel();
-          if (model) {
-            console.log(monaco.editor.tokenize(model.getValue(), 'yaml'));
-          }
-        });
       }
     );
 
