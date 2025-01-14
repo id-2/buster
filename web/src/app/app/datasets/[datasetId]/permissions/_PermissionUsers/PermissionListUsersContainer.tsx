@@ -123,7 +123,7 @@ export const PermissionListUsersContainer: React.FC<{
         onSelectChange={setSelectedRowKeys}
         emptyState={
           <div className="py-12">
-            <Text type="tertiary">No teams found</Text>
+            <Text type="tertiary">No users found</Text>
           </div>
         }
       />

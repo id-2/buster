@@ -116,7 +116,7 @@ export const PermissionListDatasetGroupContainer: React.FC<{
           showSelectAll={false}
           selectedRowKeys={selectedRowKeys}
           onSelectChange={setSelectedRowKeys}
-          emptyState={<div className="py-12">No teams found</div>}
+          emptyState={<div className="py-12">No dataset groups found</div>}
         />
       </div>
 
