@@ -1,4 +1,7 @@
-import { ListPermissionGroupsResponse, useUpdatePermissionGroups } from '@/api/busterv2/datasets';
+import {
+  ListPermissionGroupsResponse,
+  useDatasetUpdatePermissionGroups
+} from '@/api/busterv2/datasets';
 import { BusterListColumn, BusterListRowItem } from '@/components/list';
 import { BusterInfiniteList } from '@/components/list/BusterInfiniteList';
 import { useMemoizedFn } from 'ahooks';
@@ -12,7 +15,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
   datasetId: string;
 }> = React.memo(({ filteredPermissionGroups, datasetId }) => {
   const { styles, cx } = useStyles();
-  const { mutateAsync: updatePermissionGroups } = useUpdatePermissionGroups(datasetId);
+  const { mutateAsync: updatePermissionGroups } = useDatasetUpdatePermissionGroups(datasetId);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const numberOfPermissionGroups = filteredPermissionGroups.length;
